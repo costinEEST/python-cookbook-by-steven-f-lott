@@ -12,6 +12,7 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 
 - Chapter 1: Numbers, Strings, and Tuples — [Python](chapter-01/numbers-strings-tuples.py) · [TypeScript](chapter-01/numbers-strings-tuples.ts)
 - Chapter 2: Statements and Syntax — [Python](chapter-02/statements-and-syntax.py) · [TypeScript](chapter-02/statements-and-syntax.ts)
+- Chapter 3: Function Definitions — [Python](chapter-03/function-definitions.py) · [TypeScript](chapter-03/function-definitions.ts)
 
 ## Development and execution
 

@@ -175,10 +175,13 @@ uv run --locked python chapter-01/numbers-strings-tuples.py
 uv run --locked python -m py_compile chapter-01/numbers-strings-tuples.py
 uv run --locked python chapter-02/statements-and-syntax.py
 uv run --locked python -m py_compile chapter-02/statements-and-syntax.py
+uv run --locked python chapter-03/function-definitions.py
+uv run --locked python -m py_compile chapter-03/function-definitions.py
 npm run format:check
 npm run typecheck
 node chapter-01/numbers-strings-tuples.ts
 node chapter-02/statements-and-syntax.ts
+node chapter-03/function-definitions.ts
 ```
 
 Enter each command separately in Bash, zsh, PowerShell, Command Prompt, or a CI step. No command depends on chaining operators such as `&&`, a POSIX-only environment assignment such as `NAME=value command`, or activating `.venv`.
