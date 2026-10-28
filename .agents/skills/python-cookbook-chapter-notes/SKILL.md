@@ -1,6 +1,6 @@
 ---
 name: python-cookbook-chapter-notes
-description: Create or update executable Python study notes for JavaScript and TypeScript developers from saved Modern Python Cookbook HTML in this repository. Use for chapter coverage, example adaptation, source reconciliation, or Pyright/Pylance cleanup of the cookbook notes; do not use for unrelated Python projects.
+description: Creates and updates paired executable Python and TypeScript study notes for JavaScript and TypeScript developers learning from saved Modern Python Cookbook HTML in this repository. Use when asked to document a cookbook chapter, reconcile recipe coverage, add JS/TS comparisons or sibling examples, or fix Ruff, Pyright, Pylance, or TypeScript diagnostics in these notes; do not use for unrelated Python projects.
 ---
 
 # Python Cookbook Chapter Notes
@@ -73,6 +73,8 @@ Produce concise, executable notes that accurately represent the supplied source 
 8. Compare the Python and TypeScript console output when the paired chapters are intended to present the same tour.
 9. If behavior depends on a character name, rounding rule, inferred type, or interpreter version, add a focused executable check.
 10. Report exactly which source was read, which sections were covered, and which validations passed.
+
+Treat validation as a feedback loop: fix failures caused by the work, rerun the affected checks, and hand off only after the required checks pass. A command's success proves only the property it checks; retain both static and runtime verification.
 
 ## Learn from new diagnostics
 
