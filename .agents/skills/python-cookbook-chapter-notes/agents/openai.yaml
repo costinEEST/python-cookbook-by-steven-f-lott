@@ -1,4 +1,4 @@
 interface:
-  display_name: "Python Cookbook Chapter Notes"
-  short_description: "Create verified, type-safe cookbook notes"
-  default_prompt: "Use $python-cookbook-chapter-notes to turn this saved cookbook chapter into verified executable notes."
+  display_name: "Python and TypeScript Cookbook Notes"
+  short_description: "Create verified paired Python and TypeScript notes"
+  default_prompt: "Use $python-cookbook-chapter-notes to turn this saved cookbook chapter into paired, executable Python and TypeScript notes."

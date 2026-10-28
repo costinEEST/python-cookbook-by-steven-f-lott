@@ -4,6 +4,10 @@
 
 /**
  * Computes the greatest common divisor using Euclid's algorithm.
+ *
+ * @example
+ * greatestCommonDivisor(54n, 24n); // 6n
+ *
  * @param left - The first integer.
  * @param right - The second integer.
  * @returns The largest non-negative integer that divides both inputs without a remainder.
@@ -17,7 +21,12 @@ export function greatestCommonDivisor(left: bigint, right: bigint): bigint {
   return a;
 }
 
-/** Represents an exact fraction reduced to its simplest form. */
+/**
+ * Represents an exact fraction reduced to its simplest form.
+ *
+ * @example
+ * new Rational(10n, 4n).toString(); // "5/2"
+ */
 export class Rational {
   readonly numerator: bigint;
   readonly denominator: bigint;
@@ -78,7 +87,12 @@ export class Rational {
 /** Rounding modes supported by {@link FixedDecimal.quantize}. */
 export type DecimalRounding = "half-even" | "up";
 
-/** Stores a base-10 decimal as an integer coefficient and a decimal scale. */
+/**
+ * Stores a base-10 decimal as an integer coefficient and a decimal scale.
+ *
+ * @example
+ * FixedDecimal.parse("0.10").add(FixedDecimal.parse("0.20")).toString(); // "0.30"
+ */
 export class FixedDecimal {
   readonly coefficient: bigint;
   readonly scale: number;
@@ -215,6 +229,9 @@ export function isClose(
 }
 
 /**
+ * @example
+ * sumWithFloatingPointCompensation([1e16, 1, -1e16]); // 1
+ *
  * @param values - Binary floating-point values to add.
  * @returns A compensated sum that reduces cancellation error, corresponding to Python's
  * `math.fsum()`.
@@ -232,6 +249,9 @@ export function sumWithFloatingPointCompensation(values: readonly number[]): num
 }
 
 /**
+ * @example
+ * decomposeBinaryFloat(8); // [0.5, 4], because 0.5 * 2 ** 4 === 8
+ *
  * @param value - Number to decompose.
  * @returns A normalized mantissa and base-2 exponent, like Python's `math.frexp`.
  */
@@ -246,6 +266,9 @@ export function decomposeBinaryFloat(
 }
 
 /**
+ * @example
+ * composeBinaryFloat(0.5, 4); // 8
+ *
  * @param mantissa - Fractional component.
  * @param exponent - Power of two.
  * @returns The recombined number, like Python's `math.ldexp`.
@@ -265,6 +288,9 @@ export function sqrtComplex(value: number): Complex {
 }
 
 /**
+ * @example
+ * floorDivisionWithRemainder(-5, 2); // [-3, 1]
+ *
  * @param dividend - Number being divided.
  * @param divisor - Non-zero divisor.
  * @returns A floor quotient and remainder, corresponding to Python's `divmod()`.
@@ -305,7 +331,13 @@ export function fullMatch(pattern: RegExp, value: string): RegExpExecArray | nul
   return new RegExp(`^(?:${pattern.source})$`, flags).exec(value);
 }
 
-/** @param source - Pattern with insignificant whitespace and `#` comments. @returns The compiled regular expression. */
+/**
+ * @example
+ * compileVerbose(" \\d+  # one or more digits").test("42"); // true
+ *
+ * @param source - Pattern with insignificant whitespace and `#` comments.
+ * @returns The compiled regular expression.
+ */
 export function compileVerbose(source: string): RegExp {
   let compact = "";
   let escaped = false;
@@ -398,13 +430,22 @@ export const asciiWhitespace = " \t\n\r\v\f";
 /** Characters corresponding to Python's `string.punctuation`. */
 export const asciiPunctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-const unicodeNames = Object.freeze({
+const unicodeCharactersByOfficialName = Object.freeze({
+  // U+1F004 is MAHJONG TILE RED DRAGON (🀄). Braced escapes support code points above U+FFFF.
   "MAHJONG TILE RED DRAGON": "\u{1f004}",
 });
 
-/** @param name - Supported official Unicode name. @returns Its character. */
-export function unicodeByName(name: keyof typeof unicodeNames): string {
-  return unicodeNames[name];
+/**
+ * @example
+ * unicodeByName("MAHJONG TILE RED DRAGON"); // "🀄"
+ *
+ * @param name - Supported official Unicode name.
+ * @returns Its character.
+ */
+export function unicodeByName(
+  name: keyof typeof unicodeCharactersByOfficialName,
+): string {
+  return unicodeCharactersByOfficialName[name];
 }
 
 /** @param value - Text to encode. @returns Strict 7-bit ASCII bytes. @throws {TypeError} For non-ASCII input. */
@@ -420,12 +461,25 @@ export function encodeAscii(value: string): Uint8Array {
   return bytes;
 }
 
-/** @param bytes - Bytes to display. @returns A Python-style bytes literal. */
+/**
+ * @example
+ * formatPythonBytes(Uint8Array.of(0x41, 0x0a)); // "b'A\\x0a'"
+ *
+ * @param bytes - Bytes to display.
+ * @returns A Python-style bytes literal.
+ */
 export function formatPythonBytes(bytes: Uint8Array): string {
+  const firstPrintableAscii = 0x20; // SPACE
+  const lastPrintableAscii = 0x7e; // TILDE (~)
+  const apostrophe = 0x27; // Must be escaped inside the generated single-quoted literal.
+  const backslash = 0x5c; // Starts an escape sequence, so it must also be escaped.
   let content = "";
   for (const byte of bytes) {
     content +=
-      byte >= 0x20 && byte <= 0x7e && byte !== 0x27 && byte !== 0x5c
+      byte >= firstPrintableAscii &&
+      byte <= lastPrintableAscii &&
+      byte !== apostrophe &&
+      byte !== backslash
         ? String.fromCharCode(byte)
         : `\\x${byte.toString(16).padStart(2, "0")}`;
   }
@@ -445,6 +499,13 @@ export function count<T>(items: readonly T[], target: T): number {
 }
 
 /**
+ * @example
+ * const point = makeNamedTuple<[number, number], { x: number; y: number }>(
+ *   [3, 4],
+ *   { x: 0, y: 1 },
+ * );
+ * point.x === point[0]; // true
+ *
  * @param values - Positional tuple values.
  * @param fieldIndexes - Mapping from field names to tuple indexes.
  * @returns A frozen tuple-like array with named read-only fields.
