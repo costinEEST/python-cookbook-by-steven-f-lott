@@ -1,0 +1,19 @@
+{
+  "name": "python-cookbook-by-steven-f-lott",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "chapter:01:ts": "node chapter-01/numbers-strings-tuples.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.8.0"
+  }
+}
