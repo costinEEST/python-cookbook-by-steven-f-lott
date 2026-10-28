@@ -1,3 +1,19 @@
+[project]
+name = "python-cookbook-notes"
+version = "0.1.0"
+description = "Paired executable Python and TypeScript notes for Modern Python Cookbook"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.0",
+    "ty==0.0.93",
+]
+
+[tool.uv]
+package = false
+
 [tool.ruff]
 target-version = "py312"
 line-length = 88
@@ -17,3 +33,6 @@ select = [
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.ty.src]
+include = ["chapter-*"]

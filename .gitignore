@@ -99,8 +99,7 @@ ipython_config.py
 #   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
-#   This repository uses uvx only and does not manage project dependencies with uv.
-uv.lock
+#   This repository is a uv project, so uv.lock is committed.
 
 # poetry
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
@@ -207,7 +206,7 @@ cython_debug/
 tempCodeRunnerFile.py
 
 # Node.js
-# Node is used only to invoke Pyright through npx; local npm dependencies are not required.
+# npm installs the TypeScript and formatting development tools locally.
 node_modules/
 
 # Ruff stuff:

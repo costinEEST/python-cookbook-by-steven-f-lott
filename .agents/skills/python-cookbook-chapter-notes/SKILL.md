@@ -1,11 +1,11 @@
 ---
 name: python-cookbook-chapter-notes
-description: Creates and updates paired executable Python and TypeScript study notes for JavaScript and TypeScript developers learning from saved Modern Python Cookbook HTML in this repository. Use when asked to document a cookbook chapter, reconcile recipe coverage, add JS/TS comparisons or sibling examples, or fix Ruff, Pyright, Pylance, or TypeScript diagnostics in these notes; do not use for unrelated Python projects.
+description: Creates and updates paired executable Python and TypeScript study notes for JavaScript and TypeScript developers learning from saved Modern Python Cookbook HTML in this repository. Use when asked to document a cookbook chapter, reconcile recipe coverage, add JS/TS comparisons or sibling examples, or fix Ruff, ty, or TypeScript diagnostics in these notes; do not use for unrelated Python projects.
 ---
 
 # Python Cookbook Chapter Notes
 
-Produce concise, executable notes that accurately represent the supplied source and remain clean under the repository's Pyright configuration.
+Produce concise, executable notes that accurately represent the supplied source and remain clean under the repository's locked uv, Ruff, and ty configuration.
 
 ## Establish the source and scope
 
@@ -49,10 +49,12 @@ Produce concise, executable notes that accurately represent the supplied source 
 
 ## Avoid known correctness traps
 
-- Use `uvx` for standalone development tools in this repository. Do not substitute `uv run`: because the repository does not use uv for project dependency management, `uv run` can create an unintended `.venv` and `uv.lock`. Remove such generated residue before handoff if a tool creates it.
+- This repository is a non-package uv project. Commit `uv.lock`, keep `.venv/` ignored, and use `uv run --locked` for Python and Ruff so every supported shell uses the locked environment without activation.
+- Use `uv check --locked` for project-wide Python type checking. The uv–ty integration is experimental and currently runs ty only, so retain separate Ruff lint and format checks.
+- Keep documented commands portable across Bash, zsh, PowerShell, Command Prompt, and CI: use forward-slash relative paths accepted by each tool, put one command on each line, and avoid shell-specific environment assignments, activation commands, continuations, and chaining operators.
 - With TypeScript `noUncheckedIndexedAccess`, values obtained through a computed object or array key may be `undefined` even when the surrounding type looks complete. Narrow or guard the lookup before using it; do not disable the option.
 - A TypeScript `const` tuple can infer a union of its exact literal members, causing methods such as `includes()` to reject a different value that is valid for the broader domain. Widen the variable deliberately (for example, to `readonly string[]`) when the example tests arbitrary membership.
-- Let Ruff organize imports. `I001` means the import block is not in Ruff's canonical order; run `ruff check --fix` rather than hand-sorting and guessing.
+- Let Ruff organize imports. `I001` means the import block is not in Ruff's canonical order; run `uv run --locked ruff check --fix .` rather than hand-sorting and guessing.
 - Ruff `RUF032` rejects a float literal passed directly to `Decimal()` because it usually hides binary approximation. Use a string or integer for real decimal input. If teaching the approximation itself, name the float first and make the comparison explicit rather than suppressing the rule.
 - Regex matching methods return `re.Match[str] | None`. Store each result, assert or branch on `is not None`, and only then call `group()`, `groups()`, or `groupdict()`. Do not chain member access directly from `match()`, `search()`, or `fullmatch()`.
 - Python `//` floors toward negative infinity; it does not truncate toward zero. Test a negative operand when explaining the distinction.
@@ -63,12 +65,12 @@ Produce concise, executable notes that accurately represent the supplied source 
 
 ## Validate before handoff
 
-1. Read `pyproject.toml` and `pyrightconfig.json`; honor their target version, selected rules, included paths, and checking mode.
-2. After changing Python, run `ruff check --fix .` and then `ruff format .`. Review the changes; automatic fixes do not replace semantic verification.
-3. Run clean verification passes: `ruff check .`, `ruff format --check .`, and project-wide Pyright. Prefer installed commands; `uvx ruff` and `npx pyright` are documented fallbacks.
+1. Read `pyproject.toml`; honor its Python requirement, locked development tools, Ruff rules, and ty source scope.
+2. After changing Python, run `uv run --locked ruff check --fix .` and then `uv run --locked ruff format .`. Review the changes; automatic fixes do not replace semantic verification.
+3. Run clean verification passes: `uv lock --check`, `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, and `uv check --locked`.
 4. Require zero lint errors, formatting changes, type errors, and warnings unless the user explicitly accepts otherwise.
-5. Run every changed chapter script and `python3 -m py_compile` on it.
-6. Run every sibling TypeScript chapter directly with Node and run `npm run typecheck`. The direct runtime command is required because `tsc` does not prove Node can strip the syntax.
+5. Run every changed chapter with `uv run --locked python <chapter-path>` and compile it with `uv run --locked python -m py_compile <chapter-path>`.
+6. Run `npm run format:check`, `npm run typecheck`, and every sibling TypeScript chapter directly with Node. The direct runtime command is required because `tsc` does not prove Node can strip the syntax.
 7. When shared TypeScript helpers change, run every chapter that imports them; a compatibility-layer edit can affect chapters beyond the one currently being written.
 8. Compare the Python and TypeScript console output when the paired chapters are intended to present the same tour.
 9. If behavior depends on a character name, rounding rule, inferred type, or interpreter version, add a focused executable check.
@@ -78,8 +80,8 @@ Treat validation as a feedback loop: fix failures caused by the work, rerun the 
 
 ## Learn from new diagnostics
 
-- When Ruff, Pyright, Pylance, or runtime validation reveals a new recurring or non-obvious failure mode, fix all occurrences and add a concise rule here with the diagnostic code, cause, preferred fix, and validation command.
+- When Ruff, ty, TypeScript, or runtime validation reveals a new recurring or non-obvious failure mode, fix all occurrences and add a concise rule here with the diagnostic code, cause, preferred fix, and validation command.
 - Do not record one-off typos or duplicate an existing rule. Generalize only as far as the evidence supports; keep this skill useful rather than exhaustive.
 - Prefer fixing source code or configuration over suppressing a diagnostic. Add a narrow ignore only when the behavior is intentional, explain why beside the ignore, and verify that its scope cannot hide unrelated problems.
 
-Pylance and the Pyright CLI share the Pyright analysis engine and the checked-in `pyrightconfig.json`. Fix the code rather than hiding diagnostics with broad ignores or weakening strict mode.
+The ty VS Code extension and `uv check --locked` use the same `[tool.ty]` configuration. Fix source code or narrow configuration instead of hiding diagnostics with broad ignores.

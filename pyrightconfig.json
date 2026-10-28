@@ -1,6 +1,0 @@
-{
-  "include": ["chapter-*"],
-  "exclude": ["**/__pycache__", "**/.venv", "**/.git"],
-  "pythonVersion": "3.12",
-  "typeCheckingMode": "strict"
-}

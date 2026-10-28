@@ -1,5 +1,7 @@
 {
-  "python.languageServer": "Pylance",
+  "python.languageServer": "None",
+  "ty.diagnosticMode": "workspace",
+  "ty.experimental.useUv": "on",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,

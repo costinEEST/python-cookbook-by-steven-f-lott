@@ -1,65 +1,128 @@
-# Development tooling
+# Learning workflow and development tooling
 
-This project keeps its Python examples executable, consistently formatted, lint-clean, and type-safe. Only Python is required to run the examples. The other tools support development and validation.
+This repository helps a JavaScript and TypeScript developer learn Python from Steven F. Lott's _Modern Python Cookbook, Third Edition_. Each book chapter is summarized as executable Python notes, explained from a JS/TS perspective, and paired with a TypeScript version that reproduces the same examples and assertions.
+
+The tooling supports that learning workflow: [uv](https://docs.astral.sh/uv/) manages the Python interpreter and quality tools, while npm manages TypeScript and formatting tools. Checked-in lockfiles make the same commands reproducible from Bash, zsh, PowerShell, Windows Terminal, and CI without activating a virtual environment.
 
 ## Quick setup
 
-1. Install Python 3.12 or newer.
-2. Install [Visual Studio Code](https://code.visualstudio.com/) and accept the workspace's recommended extensions.
-3. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if you want to run the documented `uvx` terminal commands.
-4. Install a recent [Node.js](https://nodejs.org/) release if you want to run the official Pyright CLI through `npx`.
+Install:
 
-On macOS with Homebrew, the command-line prerequisites can be installed with:
+1. [uv 0.12.3 or newer](https://docs.astral.sh/uv/getting-started/installation/);
+2. [Node.js 23.6 or newer](https://nodejs.org/);
+3. optionally, [Visual Studio Code](https://code.visualstudio.com/) and the workspace's recommended extensions.
+
+From the repository root, prepare both locked environments:
 
 ```console
-brew install uv node
-uv python install 3.12
+uv sync --locked
+npm ci
 ```
 
-If Python 3.12 or newer and Node.js are already installed, only `uv` is missing. Confirm the setup with:
+Confirm the tools:
 
 ```console
-python3 --version
 uv --version
+uv run python --version
+uv run ruff --version
+uv run ty --version
 node --version
-npx pyright --version
-uvx ruff --version
+npm --version
 ```
 
-Do not commit a virtual environment. The repository's `.gitignore` excludes `.venv`, and `uvx` runs tools in isolated environments outside the project.
+These commands are intentionally shell-neutral. They do not use virtual-environment activation, POSIX environment-variable prefixes, shell-specific path syntax, or multiline continuations.
 
-## What each tool does
+## Project structure
+
+The Python side is deliberately a uv project that is not built or published as a package:
+
+- `.python-version` selects Python 3.12 for uv;
+- `pyproject.toml` declares the Python requirement, development tools, Ruff rules, ty scope, and `package = false`;
+- `uv.lock` pins Ruff and ty across supported platforms;
+- `.venv/` is uv's generated local environment and remains ignored.
+
+The TypeScript side remains an npm project:
+
+- `package.json` declares Node compatibility, scripts, and development tools;
+- `package-lock.json` pins TypeScript, Node type definitions, and Prettier;
+- `tsconfig.json` enables strict, erasable TypeScript that Node can execute directly;
+- `typescript/python-compat.ts` contains dependency-free Python compatibility helpers shared by chapter files.
+
+Commit both lockfiles. Do not commit `.venv/` or `node_modules/`.
+
+## Why the project uses uv and ty
+
+The project migrated from standalone `uvx` commands and Pyright/Pylance to a locked uv project with ty after Astral published [_Bringing uv and ty together_](https://astral.sh/blog/uv-ty-integration) on October 13, 2026. The article introduced first-class uv project discovery for ty and the unified `uv check` command.
+
+This repository adopts that workflow so Python selection, development dependencies, editor analysis, and command-line type checking share the same project metadata. The integration is still experimental, so its version requirements and limitations are documented below and the lockfile is committed for reproducibility.
+
+## Running chapter examples
 
 ### Python
 
-Python runs and compiles the chapter examples. The project targets Python 3.12 or newer, as declared independently in the Ruff and Pyright configurations.
+Use `uv run python` instead of relying on platform-specific launcher names such as `python3` or `py`:
 
 ```console
-python3 chapter-01/numbers-strings-tuples.py
-python3 -m py_compile chapter-01/numbers-strings-tuples.py
+uv run --locked python chapter-01/numbers-strings-tuples.py
+uv run --locked python -m py_compile chapter-01/numbers-strings-tuples.py
 ```
 
-The first command exercises the examples and assertions. `py_compile` checks that the module can be compiled, but neither command performs static type checking or linting.
+The first command executes the examples and assertions. `py_compile` verifies compilation, but neither command replaces linting or static type checking.
 
 ### TypeScript
 
-Every Python chapter has a TypeScript sibling with the same basename, section order, examples, and assertions. Reusable Python-only behavior lives in `typescript/python-compat.ts`; chapters import and exercise it rather than copying implementations. Chapter-specific presentation code may remain local.
-
-Node 23.6 or newer can run erasable TypeScript syntax directly. This project declares ESM mode in `package.json` and enables `erasableSyntaxOnly` in `tsconfig.json`, so no build step is needed:
+Node 23.6 or newer can execute the repository's erasable TypeScript directly:
 
 ```console
 node chapter-01/numbers-strings-tuples.ts
 npm run chapter:01:ts
 ```
 
-Native Node execution strips types but does not type-check them. Install the development dependencies once and run the compiler separately:
+Native execution strips types but does not check them. Use the compiler separately:
 
 ```console
-npm install
 npm run typecheck
 ```
 
-### Prettier
+Every Python chapter has a TypeScript sibling with the same basename, section order, examples, and assertions. Reusable Python-only behavior lives in `typescript/python-compat.ts`.
+
+## Python quality tools
+
+### Ruff
+
+[Ruff](https://docs.astral.sh/ruff/) provides linting, import sorting, and formatting. It is declared in the uv development dependency group and pinned by `uv.lock`.
+
+Apply safe fixes and formatting:
+
+```console
+uv run --locked ruff check --fix .
+uv run --locked ruff format .
+```
+
+Verify without modifying files:
+
+```console
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+```
+
+Ruff configuration remains in `pyproject.toml`, including Python 3.12, an 88-character code width, import sorting, Bugbear, pyupgrade, simplify, and Ruff-specific rules.
+
+### ty and uv check
+
+[ty](https://docs.astral.sh/ty/) is the Python type checker and language server. The project uses Astral's experimental uv integration:
+
+```console
+uv check --locked
+```
+
+`uv check` prepares the environment and runs the ty version pinned in `uv.lock`. The project-wide ty source scope is configured under `[tool.ty.src]` in `pyproject.toml`.
+
+The integration is experimental as of October 2026. `uv check` currently runs ty only; it does not replace the separate Ruff lint and format commands. The project requires uv 0.12.3 or newer, the minimum version announced for this integration.
+
+See the [uv check CLI reference](https://docs.astral.sh/uv/reference/cli/#uv-check) and [ty configuration reference](https://docs.astral.sh/ty/configuration/) for the current command and configuration details.
+
+## TypeScript and Markdown formatting
 
 Prettier formats TypeScript, JSON, and Markdown. Markdown prose remains unwrapped because `.prettierrc.json` sets `proseWrap` to `never`.
 
@@ -68,130 +131,66 @@ npm run format
 npm run format:check
 ```
 
-### Running code interactively
+## Visual Studio Code
 
-The chapter files can be run as complete scripts, but VS Code can also execute selected lines or cell-like sections without leaving the editor. Markdown and notebook workflows are useful when explanatory prose and executable Python need to appear together.
-
-- [Run Python code in Visual Studio Code](https://code.visualstudio.com/docs/python/run) explains running a file, selection, or line from a Python editor.
-- [Jupyter notebooks in Visual Studio Code](https://code.visualstudio.com/docs/python/jupyter-support-py) explains interactive cells and notebook-style execution alongside formatted Markdown.
-- [Run Python files with a Colab-oriented VS Code workflow](https://www.technetexperts.com/vscode-colab-run-py-files-guide/) is a third-party guide for executing `.py` files in a notebook/cloud-oriented workflow.
-
-For this repository, the `.py` files remain the canonical notes because their assertions can be checked by normal Python, Ruff, and Pyright. Interactive execution is a convenience for exploring one example at a time.
-
-### uv and uvx
-
-[`uv`](https://docs.astral.sh/uv/) is a Python tool and environment manager. `uvx` is an alias for `uv tool run`; it downloads and runs a command-line tool in an isolated environment without adding that tool to this repository.
-
-This project uses `uvx` to run Ruff:
-
-```console
-uvx ruff check .
-uvx ruff format --check .
-```
-
-Installing `uv` is therefore necessary for these exact commands, but it is not necessary for running the cookbook examples or using the VS Code extensions. For frequent use, Ruff can instead be installed persistently:
-
-```console
-uv tool install ruff
-ruff check .
-```
-
-See the official [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/), [uv tool guide](https://docs.astral.sh/uv/guides/tools/), and [Ruff installation guide](https://docs.astral.sh/ruff/installation/).
-
-### Ruff
-
-[Ruff](https://docs.astral.sh/ruff/) provides three jobs for this project:
-
-- linting for correctness and maintainability;
-- import sorting, including diagnostic `I001`;
-- deterministic code formatting.
-
-Its configuration is in [`pyproject.toml`](pyproject.toml). The important settings are:
-
-- `target-version = "py312"`;
-- line length of 88;
-- core pycodestyle and Pyflakes checks;
-- import sorting (`I`), Bugbear (`B`), pyupgrade (`UP`), simplify (`SIM`), and Ruff-specific (`RUF`) rules;
-- formatting of code examples inside docstrings.
-
-Apply safe fixes and formatting with:
-
-```console
-uvx ruff check --fix .
-uvx ruff format .
-```
-
-Then verify without modifying files:
-
-```console
-uvx ruff check .
-uvx ruff format --check .
-```
-
-### Pylance and Pyright
-
-[Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) is the recommended VS Code language server. It uses Microsoft's Pyright type checker and reports problems while editing.
-
-[Pyright](https://github.com/microsoft/pyright) is the command-line type checker. The official CLI is distributed through npm and can be run without a global installation:
-
-```console
-npx pyright
-```
-
-Node.js/npm is needed only for this CLI command. If work is performed entirely inside VS Code, Pylance can provide editor diagnostics without a separate Pyright CLI installation. The CLI remains the reproducible final check.
-
-The shared project configuration is [`pyrightconfig.json`](pyrightconfig.json):
-
-- all `chapter-*` directories are included;
-- Python 3.12 is the target;
-- strict type checking is enabled;
-- caches, virtual environments, and Git internals are excluded.
-
-Because Pylance and Pyright consume this project configuration, editor and terminal diagnostics should agree. See Microsoft's [Pyright installation guide](https://github.com/microsoft/pyright/blob/main/docs/installation.md) and [configuration reference](https://github.com/microsoft/pyright/blob/main/docs/configuration.md).
-
-### VS Code extensions
-
-The recommendations in [`.vscode/extensions.json`](.vscode/extensions.json) are:
+The workspace recommends:
 
 - Python (`ms-python.python`);
-- Pylance (`ms-python.vscode-pylance`);
+- ty (`astral-sh.ty`);
 - Ruff (`charliermarsh.ruff`);
 - Prettier (`esbenp.prettier-vscode`).
 
-Workspace behavior is configured in [`.vscode/settings.json`](.vscode/settings.json). For Python files, saving runs Ruff formatting, safe fixes, and import sorting. TypeScript and Markdown use Prettier on save. Pylance supplies Python type diagnostics, while `tsc` performs the TypeScript check from the terminal. These editor automations complement rather than replace the terminal validation commands.
+The workspace selects ty instead of Pylance to avoid running two Python language servers. `ty.experimental.useUv` is set to `"on"`, enabling uv project discovery and environment preparation, and `ty.diagnosticMode` is set to `"workspace"`.
 
-## Validation workflow
+Saving Python runs Ruff formatting, safe fixes, and import sorting. TypeScript and Markdown use Prettier on save. Editor automation complements rather than replaces terminal validation.
 
-After changing Python code, run the modifying steps first:
+## Running code interactively
+
+The chapter files can be run as complete scripts, but VS Code can also execute selected lines or cell-like sections.
+
+- [Run Python code in Visual Studio Code](https://code.visualstudio.com/docs/python/run) covers files, selections, and lines.
+- [Jupyter notebooks in Visual Studio Code](https://code.visualstudio.com/docs/python/jupyter-support-py) covers interactive cells and Markdown.
+- [Run Python files with a Colab-oriented VS Code workflow](https://www.technetexperts.com/vscode-colab-run-py-files-guide/) is a third-party cloud-oriented workflow.
+
+The `.py` files remain the canonical Python notes because their assertions can be checked by normal Python, Ruff, and ty.
+
+## Cross-platform validation workflow
+
+Run modifying format steps first:
 
 ```console
-uvx ruff check --fix .
-uvx ruff format .
+uv run --locked ruff check --fix .
+uv run --locked ruff format .
+npm run format
 ```
 
-Then run the complete non-modifying quality gate:
+Then run the non-modifying quality gate:
 
 ```console
-uvx ruff check .
-uvx ruff format --check .
-npx pyright
-python3 chapter-01/numbers-strings-tuples.py
-python3 -m py_compile chapter-01/numbers-strings-tuples.py
+uv lock --check
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+uv check --locked
+uv run --locked python chapter-01/numbers-strings-tuples.py
+uv run --locked python -m py_compile chapter-01/numbers-strings-tuples.py
 npm run format:check
 npm run typecheck
 node chapter-01/numbers-strings-tuples.ts
 ```
 
-Each tool catches a different class of problem. A successful runtime does not prove type safety, and clean type checking does not prove formatting or runtime behavior.
+Enter each command separately in Bash, zsh, PowerShell, Command Prompt, or a CI step. No command depends on chaining operators such as `&&`, a POSIX-only environment assignment such as `NAME=value command`, or activating `.venv`.
+
+Each tool proves a different property. Runtime success does not prove type safety, and a clean type check does not prove formatting or runtime behavior.
 
 ## Configuration map
 
 | File | Purpose |
 | --- | --- |
-| `pyproject.toml` | Ruff lint and format rules |
-| `pyrightconfig.json` | Shared strict Pyright/Pylance analysis rules |
+| `.python-version` | Python version selected by uv |
+| `pyproject.toml` | Project metadata, uv behavior, locked development dependencies, Ruff rules, and ty scope |
+| `uv.lock` | Cross-platform Python tool versions and hashes |
 | `.vscode/extensions.json` | Recommended VS Code extensions |
-| `.vscode/settings.json` | Pylance selection plus Ruff and Prettier actions on save |
+| `.vscode/settings.json` | uv-backed ty integration plus Ruff and Prettier actions on save |
 | `.agents/skills/python-cookbook-chapter-notes/SKILL.md` | Codex workflow and project-specific gotchas |
 | `.prettierrc.json` | TypeScript, JSON, and Markdown formatting |
 | `package.json` and `package-lock.json` | Node version, scripts, and pinned development tools |

@@ -1,6 +1,6 @@
 # Modern Python Cookbook study notes
 
-Executable study notes and examples based on Steven F. Lott's _Modern Python Cookbook, Third Edition_.
+Executable chapter summaries for learning Python from Steven F. Lott's _Modern Python Cookbook, Third Edition_ as a JavaScript and TypeScript developer. Each Python chapter is paired with a TypeScript implementation of the same examples and assertions.
 
 ## Table of contents
 
@@ -16,12 +16,12 @@ Executable study notes and examples based on Steven F. Lott's _Modern Python Coo
 
 See [Development tooling](tooling.md) for:
 
-- required and optional tools;
+- cross-platform uv and npm setup;
 - running complete Python files or selected code interactively;
 - working with Python examples from Markdown and notebooks;
 - VS Code setup and automation;
 - Ruff formatting and linting;
-- Pylance and Pyright type checking;
+- uv-backed ty type checking;
 - the complete validation workflow.
 
 ## Book resources
