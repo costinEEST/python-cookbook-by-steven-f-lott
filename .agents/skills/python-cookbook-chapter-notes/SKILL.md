@@ -61,6 +61,7 @@ Produce concise, executable notes that accurately represent the supplied source 
 - Construct `Decimal` from strings or integers when exact decimal intent matters. Construct `Fraction` with exact inputs rather than an already-rounded float.
 - Treat floating-point examples as version-sensitive. Do not assert that built-in `sum()` must be inaccurate for a chosen input; newer Python versions may improve algorithms. Assert the mathematical property or the documented behavior of `math.fsum()` instead.
 - Verify Unicode code points and names independently. `U+1F000` is MAHJONG TILE EAST WIND; `MAHJONG TILE RED DRAGON` is `U+1F004`.
+- When teaching code that is intentionally invalid or guaranteed to fail static analysis, keep the invalid form in a source string or raise the representative exception explicitly. The executable notes themselves must remain clean under ty.
 - Do not confuse a successful `py_compile` or runtime execution with static type safety. They answer different questions.
 
 ## Validate before handoff

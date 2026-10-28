@@ -527,3 +527,35 @@ export function makeNamedTuple<T extends readonly unknown[], R extends object>(
   }
   return Object.freeze(tuple) as Readonly<T> & Readonly<R>;
 }
+
+/** A resource whose external state can be released deterministically. */
+export interface ClosableResource {
+  close(): void;
+}
+
+/**
+ * Runs an operation and closes its resource after normal or exceptional exit.
+ *
+ * This models the cleanup guarantee of Python's context-manager protocol. It
+ * deliberately covers cleanup only; unlike Python's `__exit__`, it cannot
+ * suppress an exception.
+ *
+ * @example
+ * const resource = { closed: false, close() { this.closed = true; } };
+ * withResource(resource, () => "used"); // "used"
+ * resource.closed; // true
+ *
+ * @param resource - Object to close after the operation.
+ * @param operation - Work performed while the resource is available.
+ * @returns The operation's result.
+ */
+export function withResource<Resource extends ClosableResource, Result>(
+  resource: Resource,
+  operation: (resource: Resource) => Result,
+): Result {
+  try {
+    return operation(resource);
+  } finally {
+    resource.close();
+  }
+}
