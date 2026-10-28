@@ -41,6 +41,33 @@ python3 -m py_compile chapter-01/numbers-strings-tuples.py
 
 The first command exercises the examples and assertions. `py_compile` checks that the module can be compiled, but neither command performs static type checking or linting.
 
+### TypeScript
+
+Every Python chapter has a TypeScript sibling with the same basename, section order, examples, and assertions. Reusable Python-only behavior lives in `typescript/python-compat.ts`; chapters import and exercise it rather than copying implementations. Chapter-specific presentation code may remain local.
+
+Node 23.6 or newer can run erasable TypeScript syntax directly. This project declares ESM mode in `package.json` and enables `erasableSyntaxOnly` in `tsconfig.json`, so no build step is needed:
+
+```console
+node chapter-01/numbers-strings-tuples.ts
+npm run chapter:01:ts
+```
+
+Native Node execution strips types but does not type-check them. Install the development dependencies once and run the compiler separately:
+
+```console
+npm install
+npm run typecheck
+```
+
+### Prettier
+
+Prettier formats TypeScript, JSON, and Markdown. Markdown prose remains unwrapped because `.prettierrc.json` sets `proseWrap` to `never`.
+
+```console
+npm run format
+npm run format:check
+```
+
 ### Running code interactively
 
 The chapter files can be run as complete scripts, but VS Code can also execute selected lines or cell-like sections without leaving the editor. Markdown and notebook workflows are useful when explanatory prose and executable Python need to appear together.
@@ -128,9 +155,10 @@ The recommendations in [`.vscode/extensions.json`](.vscode/extensions.json) are:
 
 - Python (`ms-python.python`);
 - Pylance (`ms-python.vscode-pylance`);
-- Ruff (`charliermarsh.ruff`).
+- Ruff (`charliermarsh.ruff`);
+- Prettier (`esbenp.prettier-vscode`).
 
-Workspace behavior is configured in [`.vscode/settings.json`](.vscode/settings.json). For Python files, saving runs Ruff formatting, safe fixes, and import sorting. Pylance supplies type diagnostics. These editor automations complement rather than replace the terminal validation commands.
+Workspace behavior is configured in [`.vscode/settings.json`](.vscode/settings.json). For Python files, saving runs Ruff formatting, safe fixes, and import sorting. TypeScript and Markdown use Prettier on save. Pylance supplies Python type diagnostics, while `tsc` performs the TypeScript check from the terminal. These editor automations complement rather than replace the terminal validation commands.
 
 ## Validation workflow
 
@@ -149,6 +177,9 @@ uvx ruff format --check .
 npx pyright
 python3 chapter-01/numbers-strings-tuples.py
 python3 -m py_compile chapter-01/numbers-strings-tuples.py
+npm run format:check
+npm run typecheck
+node chapter-01/numbers-strings-tuples.ts
 ```
 
 Each tool catches a different class of problem. A successful runtime does not prove type safety, and clean type checking does not prove formatting or runtime behavior.
@@ -160,5 +191,9 @@ Each tool catches a different class of problem. A successful runtime does not pr
 | `pyproject.toml` | Ruff lint and format rules |
 | `pyrightconfig.json` | Shared strict Pyright/Pylance analysis rules |
 | `.vscode/extensions.json` | Recommended VS Code extensions |
-| `.vscode/settings.json` | Pylance selection and Ruff actions on save |
+| `.vscode/settings.json` | Pylance selection plus Ruff and Prettier actions on save |
 | `.agents/skills/python-cookbook-chapter-notes/SKILL.md` | Codex workflow and project-specific gotchas |
+| `.prettierrc.json` | TypeScript, JSON, and Markdown formatting |
+| `package.json` and `package-lock.json` | Node version, scripts, and pinned development tools |
+| `tsconfig.json` | Strict erasable TypeScript checked for native Node execution |
+| `typescript/python-compat.ts` | Shared dependency-free implementations of Python behavior absent from JavaScript |
