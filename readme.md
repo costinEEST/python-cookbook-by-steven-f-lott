@@ -10,7 +10,7 @@ Executable study notes and examples based on Steven F. Lott's _Modern Python Coo
 
 ## Chapters
 
-- [Chapter 1: Numbers, Strings, and Tuples](chapter-01/numbers-strings-tuples.py)
+- Chapter 1: Numbers, Strings, and Tuples — [Python](chapter-01/numbers-strings-tuples.py) · [TypeScript](chapter-01/numbers-strings-tuples.ts)
 
 ## Development and execution
 

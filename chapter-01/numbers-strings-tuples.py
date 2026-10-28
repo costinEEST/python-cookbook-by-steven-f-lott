@@ -14,6 +14,11 @@ from typing import NamedTuple
 # Decimal: currency/fixed places. Fraction: exact ratios. float: fast
 # approximations for measurements, roots, logarithms, pi, and similar work.
 # Avoid float for money and exact rational calculations.
+#
+# JS/TS lens: JavaScript's `number` is the same general IEEE-754 binary64 idea
+# as Python `float`. Python additionally ships exact `Decimal` and `Fraction`
+# classes; TypeScript types do not change JavaScript's runtime number model.
+# The sibling TS file supplies `FixedDecimal` and `Rational` equivalents.
 
 tax_rate = Decimal("7.25") / Decimal(100)
 purchase_amount = Decimal("2.95")
@@ -40,20 +45,26 @@ assert round(float_answer, 3) == 1.0  # For display, not proof of equality.
 # fsum() is designed for an accurate floating-point sum. (Recent Python
 # versions also improved built-in sum(), so don't rely on it being inaccurate
 # for a particular input.) A float is a binary significand plus an exponent;
-# frexp() exposes these components and ldexp() recombines them.
+# frexp() exposes these components and ldexp() recombines them. The TS file uses
+# the descriptive helpers `sumWithFloatingPointCompensation()`,
+# `decomposeBinaryFloat()`, and `composeBinaryFloat()`.
 cancellation_values = [1e16, 1.0, -1e16]
 assert math.fsum(cancellation_values) == 1.0
 mantissa, exponent = math.frexp(8.066e67)
 assert math.ldexp(mantissa, exponent) == 8.066e67
 
 # math handles real-valued operations; cmath handles complex-valued ones.
+# JavaScript has no built-in complex-number primitive or standard-library peer;
+# the TS equivalent is `sqrtComplex()`.
 assert cmath.sqrt(-2) == complex(0, math.sqrt(2))
 
 
 # 1.2 Choosing between true division and floor division
 # -----------------------------------------------------
 # Use div-mod to split units or convert bases, `/` for an approximate quotient,
-# and Fraction for an exact rational quotient.
+# and Fraction for an exact rational quotient. TypeScript uses
+# `floorDivisionWithRemainder()`, `floorDivision()`, and `Rational` because
+# JavaScript has no direct equivalents.
 
 
 def split_seconds(total_seconds: int) -> tuple[int, int, int]:
@@ -75,6 +86,7 @@ assert exact_hours == Fraction(1_477, 720)
 
 # `/` returns float for ints. `//` floors rather than truncating toward zero.
 # JavaScript's rough analogues are `/` and Math.floor(a / b).
+# JS `BigInt` division instead truncates toward zero, so `-5n / 2n === -2n`.
 assert isinstance(5 / 2, float)
 assert 5 // 2 == 2
 assert -5 // 2 == -3
@@ -86,6 +98,9 @@ assert 7_358.0 // 3_600.0 == 2.0  # A float operand gives a float result.
 # ------------------------------------------------
 # Generalize first: (ingredient words): (amount digits) (unit word). Raw
 # strings keep Python from interpreting regex backslashes before re sees them.
+# JS/TS lens: a regex literal like `/\d+/` avoids string escaping in another
+# way. Python `fullmatch()` has no direct JS method; the TS file implements
+# `fullMatch()` by anchoring the pattern.
 ingredient_text = "Kumquat: 2 cups"
 basic_pattern = re.compile(r"([\w\s]+):\s+(\d+)\s+(\w+)")
 basic_match = basic_pattern.fullmatch(ingredient_text)
@@ -109,6 +124,8 @@ assert weight_match.groups() == ("weight", "14")
 
 # Named groups avoid fragile numeric positions. Adjacent literals concatenate,
 # allowing comments beside clauses. re.VERBOSE allows comments within a regex.
+# Python spells a named group `(?P<name>...)`; JavaScript uses `(?<name>...)`.
+# JavaScript also lacks `re.VERBOSE`; the paired example uses `compileVerbose()`.
 ingredient_pattern = re.compile(
     r"(?P<ingredient>[\w\s]+):\s+"  # name before colon
     r"(?P<amount>\d+)\s+"  # amount
@@ -138,6 +155,11 @@ assert verbose_ingredient_match.groupdict() == ingredient_match.groupdict()
 
 # 1.4 Building complicated strings with f-strings
 # ------------------------------------------------
+# JS/TS lens: f-strings interpolate like template literals (`${value}`), but
+# Python's format mini-language also handles width, alignment, bases, signs,
+# precision, and debug output without calling separate formatting methods. The
+# TS file makes these operations explicit with `formatInteger()`,
+# `formatFloat()`, `formatPercent()`, `center()`, and `debugExpressions()`.
 airport_id = "IAD"
 location = "Dulles Intl Airport"
 max_temp = 32
@@ -181,6 +203,9 @@ assert weather_template.format_map(weather_data) == weather
 # -------------------------------------------------------
 # Strings are immutable. A list is a mutable intermediate representation when
 # a transformation is easiest as a series of character changes.
+# JS strings are immutable too; Python `list[str]` plays the mutable role that
+# a JavaScript character array plus `join("")` would play. The book's ASCII
+# constants are reproduced as `asciiWhitespace` and `asciiPunctuation` in TS.
 title = "Recipe 5: Rewriting an Immutable String"
 title_list = list(title)
 colon_position = title_list.index(":")
@@ -193,12 +218,17 @@ assert rewritten_title == "_Rewriting_an_Immutable_String"
 
 # Strings and lists both support indexing, slicing, and negative indexes.
 # Strings are hashable dict keys/set items; mutable lists are not hashable.
+# JS arrays can be Map keys by identity; Python dict keys require a stable hash.
 assert rewritten_title[-1] == title_list[-1] == "g"
 
 
 # 1.6 Using Unicode characters that are not on the keyboard
 # ----------------------------------------------------------
 # Python str is Unicode. Use 4-digit \u, 8-digit \U, or a Unicode name.
+# JS/TS lens: both languages expose Unicode text, but JavaScript strings are
+# indexed as UTF-16 code units. Python indexes Unicode code points, so a
+# non-BMP character such as this Mahjong tile has length 1 instead of JS's 2.
+# JavaScript has no Unicode-name escape, so TS uses `unicodeByName()`.
 die_face_one = "\u2680"
 mahjong_tile = "\U0001f000"
 named_red_dragon = "\N{MAHJONG TILE RED DRAGON}"
@@ -221,6 +251,9 @@ assert regex_source == "\\w+"
 # -----------------------------------------------------
 # Text is Unicode; files and network transfers contain bytes. Prefer UTF-8
 # unless a protocol specifies otherwise.
+# JS/TS lens: Python `bytes` is closest to a read-only byte sequence; browser
+# and Node APIs commonly use `Uint8Array`. `TextEncoder` performs UTF-8 encoding;
+# the TS file adds `encodeAscii()` for Python's strict ASCII failure behavior.
 unicode_text = f"You drew {mahjong_tile}"
 utf8_bytes = unicode_text.encode("utf-8")
 assert utf8_bytes == b"You drew \xf0\x9f\x80\x80"
@@ -244,6 +277,7 @@ else:  # pragma: no cover
 # -------------------------------------------------
 # Decode is encode's inverse. Learn the charset from XML declarations, HTTP
 # Content-Type, or HTML meta tags. Guessing UTF-8/Latin-1 is a last resort.
+# JS/TS uses `new TextDecoder("utf-8").decode(bytes)` for the same boundary.
 document_bytes = (
     b'<?xml version="1.0" encoding="UTF-8"?>\n' + "Forecast: café ⚀".encode()
 )
@@ -269,6 +303,9 @@ assert content_match.group(1).strip() == "No warnings"
 # -------------------------
 # A tuple is an immutable fixed-size grouping: (x, y), (r, g, b), etc. The
 # comma creates it, which is why a singleton requires a trailing comma.
+# JS has no tuple runtime primitive. A TypeScript tuple such as `[string,
+# number]` describes a JavaScript array and is mutable unless declared readonly;
+# `frozenTuple()` supplies the Python-like runtime immutability in the TS file.
 ingredient_tuple = ("Rice", Fraction(1, 4), "cups")
 singleton = ("item",)
 assert len(singleton) == 1
@@ -290,6 +327,11 @@ assert "Rice" not in t
 
 # 1.10 Using NamedTuple to simplify item access
 # ----------------------------------------------
+# JS/TS lens: `NamedTuple` resembles a small `readonly` interface/object in
+# readability, but at runtime it is still an immutable tuple with numeric
+# positions as well as named attributes. Python type hints, like TS types, do
+# not automatically convert input values or enforce them at runtime. The TS
+# implementation uses `makeNamedTuple()` to reproduce both access styles.
 class Ingredient(NamedTuple):
     """A tuple whose positions also have meaningful attribute names."""
 
