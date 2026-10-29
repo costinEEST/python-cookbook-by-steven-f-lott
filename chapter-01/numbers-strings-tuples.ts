@@ -1,4 +1,4 @@
-// Run with Node 23.6 or newer: node chapter-01/numbers-strings-tuples.ts
+// Run with Node 26 or newer: node chapter-01/numbers-strings-tuples.ts
 
 import assert from "node:assert/strict";
 

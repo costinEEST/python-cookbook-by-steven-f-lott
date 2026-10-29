@@ -1,4 +1,4 @@
-// Run with Node 23.6 or newer: node chapter-03/function-definitions.ts
+// Run with Node 26 or newer: node chapter-03/function-definitions.ts
 
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
@@ -375,8 +375,9 @@ function main(): void {
   );
 }
 
-// Comparing the module URL with the CLI entry path is the portable Node 23.6
-// equivalent of Python's guard. Imported modules do not run the command action.
+// Comparing the module URL with the CLI entry path is the stable Node equivalent
+// of Python's guard. Node 26 also has import.meta.main, but its API stability is
+// still early-development, so these long-lived notes retain the stable form.
 if (
   process.argv[1] !== undefined &&
   import.meta.url === pathToFileURL(process.argv[1]).href

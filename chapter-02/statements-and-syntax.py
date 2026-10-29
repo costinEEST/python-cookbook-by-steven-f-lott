@@ -301,8 +301,8 @@ else:  # pragma: no cover
 
 # 2.11 Managing a context using the with statement
 # -------------------------------------------------
-# Context managers guarantee cleanup after normal or exceptional exit. JS/TS
-# has no universal with protocol; the sibling uses shared withResource().
+# Context managers guarantee cleanup after normal or exceptional exit. Modern
+# ECMAScript `using` calls Symbol.dispose at scope exit for the same guarantee.
 target = StringIO()
 written_csv = ""
 try:

@@ -71,7 +71,7 @@ The first command executes the examples and assertions. `py_compile` verifies co
 
 ### TypeScript
 
-Node 23.6 or newer can execute the repository's erasable TypeScript directly:
+Node 26 or newer can execute the repository's erasable TypeScript directly:
 
 ```console
 node chapter-01/numbers-strings-tuples.ts

@@ -1,8 +1,8 @@
-// Run with Node 23.6 or newer: node chapter-02/statements-and-syntax.ts
+// Run with Node 26 or newer: node chapter-02/statements-and-syntax.ts
 
 import assert from "node:assert/strict";
 
-import { decomposeBinaryFloat, withResource } from "../typescript/python-compat.ts";
+import { decomposeBinaryFloat } from "../typescript/python-compat.ts";
 
 // 2.1 Writing Python script and module files – syntax basics
 // ----------------------------------------------------------
@@ -263,7 +263,8 @@ assert.throws(translateTypeError, (error: unknown) => {
 
 // 2.11 Managing a context using the with statement
 // -------------------------------------------------
-// withResource() supplies Python-like deterministic cleanup through finally.
+// ECMAScript explicit resource management gives using the same normal/exceptional
+// scope-exit guarantee as Python with. A resource opts in with Symbol.dispose.
 class CsvBuffer {
   closed = false;
   readonly rows: string[] = [];
@@ -277,6 +278,10 @@ class CsvBuffer {
     this.closed = true;
   }
 
+  [Symbol.dispose](): void {
+    this.close();
+  }
+
   toString(): string {
     return this.rows.join("\n") + "\n";
   }
@@ -284,18 +289,15 @@ class CsvBuffer {
 
 const target = new CsvBuffer();
 let writtenCsv = "";
-assert.throws(
-  () =>
-    withResource(target, (targetFile) => {
-      targetFile.write(["column", "data", "heading"]);
-      targetFile.write([2, 3, 5]);
-      targetFile.write([7, 11, 13]);
-      targetFile.write([17, 19, 23]);
-      writtenCsv = targetFile.toString();
-      throw new Error("Testing");
-    }),
-  /Testing/,
-);
+assert.throws(() => {
+  using targetFile = target;
+  targetFile.write(["column", "data", "heading"]);
+  targetFile.write([2, 3, 5]);
+  targetFile.write([7, 11, 13]);
+  targetFile.write([17, 19, 23]);
+  writtenCsv = targetFile.toString();
+  throw new Error("Testing");
+}, /Testing/);
 assert.equal(target.closed, true);
 assert.equal(writtenCsv, "column,data,heading\n2,3,5\n7,11,13\n17,19,23\n");
 

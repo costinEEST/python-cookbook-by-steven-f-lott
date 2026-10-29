@@ -1,4 +1,4 @@
-// Run with Node 23.6 or newer: node chapter-05/dictionaries.ts
+// Run with Node 26 or newer: node chapter-05/dictionaries.ts
 
 import assert from "node:assert/strict";
 

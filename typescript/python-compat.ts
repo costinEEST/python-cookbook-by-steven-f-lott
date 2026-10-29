@@ -319,48 +319,6 @@ export function splitSeconds(totalSeconds: number): readonly [number, number, nu
   return [hours, minutes, seconds];
 }
 
-/**
- * @param left - First input set.
- * @param right - Second input set.
- * @returns A new set containing every member found in either input, like Python's `|`.
- */
-export function setUnion<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): Set<T> {
-  return new Set([...left, ...right]);
-}
-
-/**
- * @param left - First input set.
- * @param right - Second input set.
- * @returns A new set containing members shared by both inputs, like Python's `&`.
- */
-export function setIntersection<T>(
-  left: ReadonlySet<T>,
-  right: ReadonlySet<T>,
-): Set<T> {
-  return new Set([...left].filter((value) => right.has(value)));
-}
-
-/**
- * @param left - Set from which members are selected.
- * @param right - Set whose members are excluded.
- * @returns A new set containing members found only in `left`, like Python's `-`.
- */
-export function setDifference<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): Set<T> {
-  return new Set([...left].filter((value) => !right.has(value)));
-}
-
-/**
- * @param left - First input set.
- * @param right - Second input set.
- * @returns A new set containing members found in exactly one input, like Python's `^`.
- */
-export function setSymmetricDifference<T>(
-  left: ReadonlySet<T>,
-  right: ReadonlySet<T>,
-): Set<T> {
-  return setUnion(setDifference(left, right), setDifference(right, left));
-}
-
 /** @param value - Number to round. @param digits - Decimal places to retain. @returns The rounded number. */
 export function roundTo(value: number, digits: number): number {
   const factor = 10 ** digits;
@@ -568,36 +526,4 @@ export function makeNamedTuple<T extends readonly unknown[], R extends object>(
     });
   }
   return Object.freeze(tuple) as Readonly<T> & Readonly<R>;
-}
-
-/** A resource whose external state can be released deterministically. */
-export interface ClosableResource {
-  close(): void;
-}
-
-/**
- * Runs an operation and closes its resource after normal or exceptional exit.
- *
- * This models the cleanup guarantee of Python's context-manager protocol. It
- * deliberately covers cleanup only; unlike Python's `__exit__`, it cannot
- * suppress an exception.
- *
- * @example
- * const resource = { closed: false, close() { this.closed = true; } };
- * withResource(resource, () => "used"); // "used"
- * resource.closed; // true
- *
- * @param resource - Object to close after the operation.
- * @param operation - Work performed while the resource is available.
- * @returns The operation's result.
- */
-export function withResource<Resource extends ClosableResource, Result>(
-  resource: Resource,
-  operation: (resource: Resource) => Result,
-): Result {
-  try {
-    return operation(resource);
-  } finally {
-    resource.close();
-  }
 }

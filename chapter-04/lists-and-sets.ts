@@ -1,14 +1,8 @@
-// Run with Node 23.6 or newer: node chapter-04/lists-and-sets.ts
+// Run with Node 26 or newer: node chapter-04/lists-and-sets.ts
 
 import assert from "node:assert/strict";
 
-import {
-  floorDivisionWithRemainder,
-  setDifference,
-  setIntersection,
-  setSymmetricDifference,
-  setUnion,
-} from "../typescript/python-compat.ts";
+import { floorDivisionWithRemainder } from "../typescript/python-compat.ts";
 
 // Executable TypeScript parallels for Modern Python Cookbook, Chapter 4.
 
@@ -206,16 +200,14 @@ assert.deepEqual(allImports, names);
 assert.deepEqual(allImports, new Set(["pathlib", "typing", "argparse"]));
 
 const collection = new Set([1]);
-const union = setUnion(collection, new Set([3]));
+// Modern ECMAScript Set algebra returns new sets without mutating either input.
+const union = collection.union(new Set([3]));
 assert.deepEqual(union, new Set([1, 3]));
 assert.deepEqual(collection, new Set([1]));
 collection.add(3).add(4);
-assert.deepEqual(setIntersection(collection, new Set([3, 5])), new Set([3]));
-assert.deepEqual(
-  setSymmetricDifference(collection, new Set([3, 5])),
-  new Set([1, 4, 5]),
-);
-assert.deepEqual(setDifference(collection, new Set([1, 4])), new Set([3]));
+assert.deepEqual(collection.intersection(new Set([3, 5])), new Set([3]));
+assert.deepEqual(collection.symmetricDifference(new Set([3, 5])), new Set([1, 4, 5]));
+assert.deepEqual(collection.difference(new Set([1, 4])), new Set([3]));
 
 // 4.8 Shrinking sets: remove(), pop(), and difference
 // ----------------------------------------------------
@@ -223,7 +215,7 @@ const log = "IP: 111.222.111.222; placeholders IP: 1.2.3.4 and IP: 0.0.0.0";
 const matches = new Set(log.match(/IP: \d+\.\d+\.\d+\.\d+/g) ?? []);
 const ignored = new Set(["IP: 0.0.0.0", "IP: 1.2.3.4"]);
 const expectedMatches = new Set(["IP: 111.222.111.222"]);
-assert.deepEqual(setDifference(matches, ignored), expectedMatches);
+assert.deepEqual(matches.difference(ignored), expectedMatches);
 
 const validMatches = new Set(matches);
 for (const item of ignored) validMatches.delete(item);
@@ -246,7 +238,7 @@ const DIE_FACES = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"] as const;
 type Die = (typeof DIE_FACES)[number];
 
 function setsEqual<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): boolean {
-  return left.size === right.size && [...left].every((value) => right.has(value));
+  return left.size === right.size && left.isSubsetOf(right);
 }
 
 function evaluateZonkSix(hand: readonly Die[]): string {
