@@ -301,11 +301,52 @@ Environment variables are string-valued, slowly changing defaults. Validate them
 
 ### Stage 2 — Interfaces and object design
 
-The following chapters are roadmap entries. Their summaries will be replaced with verified syntax and TypeScript comparisons when their paired notes are added.
+Chapters with executable links are verified notes. Later summaries remain roadmap entries until their paired files are added.
 
 #### Chapter 7: Basics of Classes and Objects
 
-Planned focus: class syntax, instances, `self`, `__init__`, attributes, methods, properties, inheritance, composition, and comparison with JavaScript prototypes and TypeScript access modifiers.
+[Python notes](chapter-07/basics-of-classes-and-objects.py) · [TypeScript notes](chapter-07/basics-of-classes-and-objects.ts)
+
+Python passes `self` explicitly to instance methods; JavaScript supplies `this` dynamically to ordinary methods. `__init__()` initializes an already-created instance. Attribute annotations and method signatures help static checkers but do not validate values at runtime, just as TypeScript types are erased.
+
+```python
+class Dice:
+    def __init__(self, faces: tuple[int, int]) -> None:
+        self.faces = faces
+
+    def total(self) -> int:
+        return sum(self.faces)
+```
+
+Choose class shape from behavior and mutability:
+
+| Python design | Runtime behavior | TypeScript/JavaScript comparison |
+| --- | --- | --- |
+| ordinary class | mutable attributes, usually stored in `__dict__` | JS class instance; TS fields/access modifiers are mostly static constraints |
+| `NamedTuple` | immutable, positional and named access, tuple ordering/hashing | no direct equivalent; a `readonly` tuple lacks named fields and runtime immutability |
+| `@dataclass` | generated initialization, representation, and value equality | TS types generate no runtime methods; write a class/factory and equality explicitly |
+| `@dataclass(frozen=True)` | runtime field-rebinding guard, still shallow | `readonly` is normally static; `Object.freeze()` is shallow runtime protection |
+| `__slots__` | fixed attributes and usually no per-instance `__dict__` | TS declarations do not constrain runtime shape; `Object.seal()` only approximates shape restriction |
+
+Use `field(default_factory=list)` for a fresh mutable default per dataclass instance. Freezing is shallow: a frozen field can still refer to a mutable list. Use `ClassVar[T]` for class-level configuration that must not become a dataclass field.
+
+Composition wraps data with processing; inheritance specializes a storage type. An eager wrapper computes once but becomes stale when aliased source data changes. A property computes lazily and preserves attribute syntax:
+
+```python
+class Statistics:
+    def __init__(self, values: list[float]) -> None:
+        self.values = values
+
+    @property
+    def mean(self) -> float:
+        return sum(self.values) / len(self.values)
+```
+
+JavaScript `get mean()` is the close analogue. Cached properties need an invalidation strategy when mutable input changes.
+
+Specialized standard-library collections encode useful performance and missing-value behavior: `deque` for efficient operations at both ends, `defaultdict` for generated missing values, `Counter` for multisets, and `ChainMap` for ordered mapping overlays. JavaScript `Map` requires these behaviors to be built explicitly; `Array.shift()` is not an efficient long-lived FIFO.
+
+Context managers put acquisition and guaranteed cleanup around a scope. `__enter__()` may return the object used after `as`; `__exit__()` receives exception details and may suppress the exception by returning true. A compound `with` enters managers left-to-right and exits them right-to-left. Node 26 `using` plus `Symbol.dispose` gives deterministic reverse-order cleanup, but disposal has no Python-style exception-suppression return value.
 
 #### Chapter 8: More Advanced Class Design
 
