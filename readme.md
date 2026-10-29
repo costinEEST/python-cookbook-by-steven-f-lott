@@ -18,6 +18,7 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 - Chapter 5: Built-In Data Structures Part 2: Dictionaries — [Python](chapter-05/dictionaries.py) · [TypeScript](chapter-05/dictionaries.ts)
 - Chapter 6: User Inputs and Outputs — [Python](chapter-06/user-inputs-and-outputs.py) · [TypeScript](chapter-06/user-inputs-and-outputs.ts)
 - Chapter 7: Basics of Classes and Objects — [Python](chapter-07/basics-of-classes-and-objects.py) · [TypeScript](chapter-07/basics-of-classes-and-objects.ts)
+- Chapter 8: More Advanced Class Design — [Python](chapter-08/more-advanced-class-design.py) · [TypeScript](chapter-08/more-advanced-class-design.ts)
 
 ## Python for TypeScript reference
 

@@ -350,7 +350,32 @@ Context managers put acquisition and guaranteed cleanup around a scope. `__enter
 
 #### Chapter 8: More Advanced Class Design
 
-Planned focus: dataclasses, named tuples, protocols, abstract base classes, descriptors, special methods, immutability, hashing, and object construction patterns.
+[Python notes](chapter-08/more-advanced-class-design.py) · [TypeScript notes](chapter-08/more-advanced-class-design.ts)
+
+Choose inheritance only for a genuine substitutable **is-a** relationship. A `list` subclass inherits indexing, slicing, iteration, and every mutator; a wrapper with a list field exposes only the intended **has-a** API. JavaScript has the same tradeoff between `extends Array` and composition.
+
+Modern JavaScript `class` semantics are not merely alternate spelling for manually connecting ES5 function prototypes. A derived built-in such as `class Deck extends Array {}` participates in built-in subclass allocation; inherited copying methods use `Symbol.species` and normally preserve `Deck`. Class constructors require `new`, class methods are non-enumerable and non-constructible, `super` has dedicated semantics, and `#private` fields enforce runtime brands. These details matter when comparing JavaScript inheritance with Python rather than reducing either model to prototype lookup. See Andrea Giammarchi's [JS classes are not “just syntactic sugar”](https://webreflection.medium.com/js-classes-are-not-just-syntactic-sugar-28690fedf078) for the supplemental JavaScript examples.
+
+Python multiple inheritance combines behavior according to the class's method resolution order (`SomeClass.mro()`). Keep mixins small and concern-specific. A `Protocol` describes the minimum structural shape a consumer needs without forcing implementations into a hierarchy:
+
+```python
+class Dice(Protocol):
+    def roll(self) -> tuple[int, ...]: ...
+
+
+def sample(dice: Dice) -> tuple[int, ...]:
+    return dice.roll()
+```
+
+This is close to a TypeScript `interface`: both enable static structural checking and disappear at runtime. Python still performs ordinary duck-typed attribute lookup at runtime; inheriting a protocol is not required for a compatible class.
+
+Module variables and class variables are shared objects. Imports cache a module in `sys.modules`, while `ClassVar[T]` documents state stored on the class rather than each instance. These are useful for narrow registries, logging, or counters, but explicit dependency injection gives tests and callers independent state more easily. ES modules and `static` fields have similar lifetime and coupling concerns.
+
+Use `defaultdict(list)` for a map of lists when missing-key access should install a fresh list. Access mutates the mapping, then `append()` mutates that list and returns `None`; JavaScript `Map` requires explicit get-or-create logic.
+
+Ordering operators call rich-comparison methods such as `__lt__()` and `__le__()`. Comparing `(self.rank, self.suit)` tuples is a compact lexicographic key; `@dataclass(order=True)` or `functools.total_ordering` can generate methods. JavaScript objects cannot customize `<` this way, so pass a comparator to `toSorted()`/`sort()`.
+
+When deleting matching list items in place, do not advance the index after `del items[index]`: the next item shifts into that index. A comprehension is usually simpler and faster when a new outer list is acceptable, but it is shallow and retains references to the same nested objects. The corresponding JavaScript distinction is in-place `splice()` versus copying `filter()`.
 
 ### Stage 3 — Functional and typed Python
 

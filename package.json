@@ -13,6 +13,7 @@
     "chapter:05:ts": "node chapter-05/dictionaries.ts",
     "chapter:06:ts": "node chapter-06/user-inputs-and-outputs.ts",
     "chapter:07:ts": "node chapter-07/basics-of-classes-and-objects.ts",
+    "chapter:08:ts": "node chapter-08/more-advanced-class-design.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
