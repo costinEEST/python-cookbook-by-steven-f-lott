@@ -10,6 +10,7 @@
     "chapter:02:ts": "node chapter-02/statements-and-syntax.ts",
     "chapter:03:ts": "node chapter-03/function-definitions.ts",
     "chapter:04:ts": "node chapter-04/lists-and-sets.ts",
+    "chapter:05:ts": "node chapter-05/dictionaries.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
