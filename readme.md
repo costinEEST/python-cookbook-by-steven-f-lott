@@ -5,6 +5,7 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 ## Table of contents
 
 - [Chapters](#chapters)
+- [Python for TypeScript reference](#python-for-typescript-reference)
 - [Development and execution](#development-and-execution)
 - [Book resources](#book-resources)
 
@@ -13,6 +14,12 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 - Chapter 1: Numbers, Strings, and Tuples — [Python](chapter-01/numbers-strings-tuples.py) · [TypeScript](chapter-01/numbers-strings-tuples.ts)
 - Chapter 2: Statements and Syntax — [Python](chapter-02/statements-and-syntax.py) · [TypeScript](chapter-02/statements-and-syntax.ts)
 - Chapter 3: Function Definitions — [Python](chapter-03/function-definitions.py) · [TypeScript](chapter-03/function-definitions.ts)
+- Chapter 4: Built-In Data Structures Part 1: Lists and Sets — [Python](chapter-04/lists-and-sets.py) · [TypeScript](chapter-04/lists-and-sets.ts)
+- Chapter 5: Built-In Data Structures Part 2: Dictionaries — [Python](chapter-05/dictionaries.py) · [TypeScript](chapter-05/dictionaries.ts)
+
+## Python for TypeScript reference
+
+Use the [Python for TypeScript Developers cheatsheet](python-for-typescript-developers.md) as a quick syntax reference, terminology guide, and 17-chapter learning path. It is expanded whenever a new chapter is added.
 
 ## Development and execution
 

@@ -1,16 +1,26 @@
 ---
 name: python-cookbook-chapter-notes
-description: Creates and updates paired executable Python and TypeScript study notes for JavaScript and TypeScript developers learning from saved Modern Python Cookbook HTML in this repository. Use when asked to document a cookbook chapter, reconcile recipe coverage, add JS/TS comparisons or sibling examples, or fix Ruff, ty, or TypeScript diagnostics in these notes; do not use for unrelated Python projects.
+description: Creates and updates paired executable Python and TypeScript study notes and the root Python-for-TypeScript reference for saved Modern Python Cookbook chapters in this repository. Use when asked to document a cookbook chapter, reconcile recipe coverage, add JS/TS comparisons, maintain the cheatsheet, or fix Ruff, ty, or TypeScript diagnostics in these notes; do not use for unrelated Python projects.
 ---
 
 # Python Cookbook Chapter Notes
 
 Produce concise, executable notes that accurately represent the supplied source and remain clean under the repository's locked uv, Ruff, and ty configuration.
 
+## Keep the root reference synchronized
+
+- Every time a chapter is created or materially expanded, update `python-for-typescript-developers.md` in the same change. Replace that chapter's roadmap placeholder with concise, verified syntax, semantics, terminology, TypeScript comparisons, and links to its executable Python and TypeScript notes.
+- Treat Chapters 1–5 as completed and Chapters 6–17 as the planned progression until their paired files exist. Never present roadmap material as verified chapter coverage.
+- Keep the reference optimized for recall: compact side-by-side idioms, small executable-looking examples, plain-language definitions, and high-value transfer warnings for TypeScript developers. Avoid duplicating the full chapter notes.
+- Preserve the 17-chapter learning path and its exact chapter titles. Keep the root `readme.md` link to the reference and add new chapter file links to both files when a chapter is added.
+- Use these sites as structural inspiration, not text to copy: [Programming Idioms Python/JavaScript cheatsheet](https://programming-idioms.org/cheatsheet/Python/JS) for task-oriented, side-by-side runtime comparisons, [Python Morsels terminology](https://www.pythonmorsels.com/terms/) for approachable definitions, and [Real Python learning paths](https://realpython.com/learning-paths/) for staged organization.
+
 ## Establish the source and scope
 
+- When a request includes URLs, open each URL with the Chrome MCP before relying on its content. Inspect the rendered page and its relevant headings, tables, examples, or article body; a search result or indexed excerpt does not count as opening the URL.
+- If Chrome MCP cannot load the page, report the exact blocker and then use the best available fallback, such as a user-saved HTML file or indexed excerpt. Label fallback provenance accurately and do not imply that partial content is the complete page.
 - Inspect the requested source before editing. A browser security or login page is not the book page.
-- When an MCP browser is blocked by Cloudflare, say so plainly. Do not claim that indexed search excerpts are the complete page.
+- When the Chrome MCP is blocked by Cloudflare or another access control, say so plainly. Do not claim that indexed search excerpts are the complete page.
 - Prefer a user-saved HTML file when available. A `file://` URL may be opened through the browser MCP when direct page access is blocked.
 - Inventory the saved document's recipe-level headings before writing. Distinguish one linked section from an entire saved chapter.
 - Interpret “all topics” as every substantive recipe in the supplied artifact, including its preparation, examples, explanation, and supplementary material. Navigation, advertising, and duplicated interface text are not content.
