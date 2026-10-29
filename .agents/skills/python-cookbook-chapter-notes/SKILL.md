@@ -18,6 +18,13 @@ Produce concise, executable notes that accurately represent the supplied source 
 ## Establish the source and scope
 
 - When a request includes URLs, open each URL with the Chrome MCP before relying on its content. Inspect the rendered page and its relevant headings, tables, examples, or article body; a search result or indexed excerpt does not count as opening the URL.
+- If opening a page fails because the browser profile is already in use (for example, `The browser is already running for .../.cache/chrome-devtools-mcp/chrome-profile`), recover the Chrome MCP as follows:
+  1. Try `list_pages` first. If it succeeds, reuse that MCP browser and open or navigate a page instead of starting another browser instance.
+  2. If the MCP cannot list or open pages, inspect only the relevant processes with `ps aux | rg 'chrome-devtools-mcp|chrome-profile'`. The sandbox may reject `ps`; if so, request approval for this exact read-only inspection with a narrow reusable `ps aux` prefix.
+  3. Distinguish the current MCP process from an older orphan by start time and command line. Identify the stale `npm exec chrome-devtools-mcp...` process, its `chrome-devtools-mcp` child, and the dedicated browser main process whose command contains `--user-data-dir=.../.cache/chrome-devtools-mcp/chrome-profile`. Do not target an ordinary user browser or kill every Chrome, Edge, Node, or npm process.
+  4. Request approval to send a normal termination signal to the explicit stale PIDs, for example `kill <stale-npm-pid> <stale-mcp-pid> <stale-browser-pid>`. Do not use a broad `pkill`, wildcard, command substitution, or `kill -9` as the first attempt. Retry the Chrome MCP after termination.
+  5. Only when process inspection confirms that no browser uses the MCP profile, inspect `~/.cache/chrome-devtools-mcp/chrome-profile/SingletonLock`, `SingletonSocket`, and `SingletonCookie`. If stale singleton files alone remain, request approval to remove those exact files and retry. Never delete the whole `chrome-devtools-mcp` cache or profile; it may contain useful browser state.
+  6. Stop once `list_pages` or `new_page` succeeds. Report whether recovery required process termination or stale singleton cleanup.
 - If Chrome MCP cannot load the page, report the exact blocker and then use the best available fallback, such as a user-saved HTML file or indexed excerpt. Label fallback provenance accurately and do not imply that partial content is the complete page.
 - Inspect the requested source before editing. A browser security or login page is not the book page.
 - When the Chrome MCP is blocked by Cloudflare or another access control, say so plainly. Do not claim that indexed search excerpts are the complete page.
