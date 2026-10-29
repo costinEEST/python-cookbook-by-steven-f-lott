@@ -5,10 +5,10 @@ import assert from "node:assert/strict";
 import type { WeatherData } from "../typescript/python-compat.ts";
 
 import {
+  ASCII_PUNCTUATION,
+  ASCII_WHITESPACE,
   FixedDecimal,
   Rational,
-  asciiPunctuation,
-  asciiWhitespace,
   center,
   composeBinaryFloat,
   compileVerbose,
@@ -146,7 +146,7 @@ titleList.splice(0, colonPosition + 1);
 for (let index = 0; index < titleList.length; index += 1) {
   const character = titleList[index];
   assert.ok(character !== undefined);
-  if (asciiWhitespace.includes(character) || asciiPunctuation.includes(character)) {
+  if (ASCII_WHITESPACE.includes(character) || ASCII_PUNCTUATION.includes(character)) {
     titleList[index] = "_";
   }
 }

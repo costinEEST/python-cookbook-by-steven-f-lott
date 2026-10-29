@@ -426,11 +426,11 @@ export function formatWeather(data: WeatherData): string {
 }
 
 /** Characters corresponding to Python's `string.whitespace`. */
-export const asciiWhitespace = " \t\n\r\v\f";
+export const ASCII_WHITESPACE = " \t\n\r\v\f";
 /** Characters corresponding to Python's `string.punctuation`. */
-export const asciiPunctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+export const ASCII_PUNCTUATION = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-const unicodeCharactersByOfficialName = Object.freeze({
+const UNICODE_CHARACTERS_BY_OFFICIAL_NAME = Object.freeze({
   // U+1F004 is MAHJONG TILE RED DRAGON (🀄). Braced escapes support code points above U+FFFF.
   "MAHJONG TILE RED DRAGON": "\u{1f004}",
 });
@@ -443,9 +443,9 @@ const unicodeCharactersByOfficialName = Object.freeze({
  * @returns Its character.
  */
 export function unicodeByName(
-  name: keyof typeof unicodeCharactersByOfficialName,
+  name: keyof typeof UNICODE_CHARACTERS_BY_OFFICIAL_NAME,
 ): string {
-  return unicodeCharactersByOfficialName[name];
+  return UNICODE_CHARACTERS_BY_OFFICIAL_NAME[name];
 }
 
 /** @param value - Text to encode. @returns Strict 7-bit ASCII bytes. @throws {TypeError} For non-ASCII input. */

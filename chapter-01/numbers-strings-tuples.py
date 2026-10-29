@@ -205,7 +205,7 @@ assert weather_template.format_map(weather_data) == weather
 # a transformation is easiest as a series of character changes.
 # JS strings are immutable too; Python `list[str]` plays the mutable role that
 # a JavaScript character array plus `join("")` would play. The book's ASCII
-# constants are reproduced as `asciiWhitespace` and `asciiPunctuation` in TS.
+# constants are reproduced as `ASCII_WHITESPACE` and `ASCII_PUNCTUATION` in TS.
 title = "Recipe 5: Rewriting an Immutable String"
 title_list = list(title)
 colon_position = title_list.index(":")
