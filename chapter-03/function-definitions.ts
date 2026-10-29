@@ -3,30 +3,44 @@
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 
+import { makeNamedTuple } from "../typescript/python-compat.ts";
+
 // 3.1 Function parameters and type hints
 // ---------------------------------------
 // TypeScript types are erased like Python hints, but TS narrows unions during
 // static analysis. Neither language coerces values merely because of a hint.
 type RGBTuple = readonly [red: number, green: number, blue: number];
 type HSLTuple = readonly [hue: number, saturation: number, lightness: number];
-
-function hexToRgb(hexadecimal: number | string): RGBTuple {
-  const value =
-    typeof hexadecimal === "string"
-      ? Number.parseInt(hexadecimal.replace(/^#/, ""), 16)
-      : hexadecimal;
-  return [(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff];
-}
-
-assert.deepEqual(hexToRgb("#C62D42"), [198, 45, 66]);
-assert.deepEqual(hexToRgb("C62D42"), [198, 45, 66]);
-assert.deepEqual(hexToRgb(0xc62d42), [198, 45, 66]);
-
-interface RGB {
+interface RGBFields {
   readonly red: number;
   readonly green: number;
   readonly blue: number;
 }
+
+const HEXADECIMAL_RADIX = 16;
+const BITS_PER_COLOR_CHANNEL = 8;
+const GREEN_CHANNEL_SHIFT = BITS_PER_COLOR_CHANNEL;
+const RED_CHANNEL_SHIFT = BITS_PER_COLOR_CHANNEL * 2;
+const BYTE_MASK = 0xff; // Hexadecimal 0xFF is decimal 255: eight 1 bits.
+const SAMPLE_RED_HEX = 0xc62d42; // Hexadecimal 0xC62D42 is decimal 12,987,714.
+
+function hexToRgb(hexadecimal: number | string): RGBTuple {
+  const value =
+    typeof hexadecimal === "string"
+      ? Number.parseInt(hexadecimal.replace(/^#/, ""), HEXADECIMAL_RADIX)
+      : hexadecimal;
+  // Right shift moves the selected 8-bit channel to the low end; bitwise AND
+  // with BYTE_MASK then clears every bit except those lowest eight bits.
+  return [
+    (value >> RED_CHANNEL_SHIFT) & BYTE_MASK,
+    (value >> GREEN_CHANNEL_SHIFT) & BYTE_MASK,
+    value & BYTE_MASK,
+  ];
+}
+
+assert.deepEqual(hexToRgb("#C62D42"), [198, 45, 66]);
+assert.deepEqual(hexToRgb("C62D42"), [198, 45, 66]);
+assert.deepEqual(hexToRgb(SAMPLE_RED_HEX), [198, 45, 66]);
 
 function rgbTupleToHsl(color: RGBTuple): HSLTuple {
   const red = color[0] / 255;
@@ -37,8 +51,16 @@ function rgbTupleToHsl(color: RGBTuple): HSLTuple {
 }
 
 const [red, green, blue] = hexToRgb("C62D42");
-const namedRgb: RGB = { red, green, blue };
-assert.deepEqual(namedRgb, { red: 198, green: 45, blue: 66 });
+const namedRgb = makeNamedTuple<RGBTuple, RGBFields>([red, green, blue], {
+  red: 0,
+  green: 1,
+  blue: 2,
+});
+assert.deepEqual(Array.from(namedRgb), [198, 45, 66]);
+assert.deepEqual(
+  { red: namedRgb.red, green: namedRgb.green, blue: namedRgb.blue },
+  { red: 198, green: 45, blue: 66 },
+);
 assert.deepEqual(rgbTupleToHsl([128, 128, 128]), [0, 0, 128 / 255]);
 
 // 3.2 Designing functions with optional parameters

@@ -10,25 +10,34 @@ from pathlib import Path
 from random import Random
 from typing import NamedTuple, TextIO
 
-
 # 3.1 Function parameters and type hints
 # ---------------------------------------
 # Python hints are optional runtime metadata checked by external tools such as
 # ty. Like TypeScript types, they are primarily static and do not coerce input.
+HEXADECIMAL_RADIX = 16
+BITS_PER_COLOR_CHANNEL = 8
+GREEN_CHANNEL_SHIFT = BITS_PER_COLOR_CHANNEL
+RED_CHANNEL_SHIFT = BITS_PER_COLOR_CHANNEL * 2
+BYTE_MASK = 0xFF  # Hexadecimal 0xFF is decimal 255: eight 1 bits.
+SAMPLE_RED_HEX = 0xC62D42  # Hexadecimal 0xC62D42 is decimal 12,987,714.
+
+
 def hex_to_rgb(hexadecimal: int | str) -> tuple[int, int, int]:
     """Split a 24-bit integer or hexadecimal string into red, green, and blue."""
     if isinstance(hexadecimal, str):
-        hexadecimal = int(hexadecimal.removeprefix("#"), 16)
+        hexadecimal = int(hexadecimal.removeprefix("#"), HEXADECIMAL_RADIX)
+    # Right shift moves the selected 8-bit channel to the low end; bitwise AND
+    # with BYTE_MASK then clears every bit except those lowest eight bits.
     return (
-        (hexadecimal >> 16) & 0xFF,
-        (hexadecimal >> 8) & 0xFF,
-        hexadecimal & 0xFF,
+        (hexadecimal >> RED_CHANNEL_SHIFT) & BYTE_MASK,
+        (hexadecimal >> GREEN_CHANNEL_SHIFT) & BYTE_MASK,
+        hexadecimal & BYTE_MASK,
     )
 
 
 assert hex_to_rgb("#C62D42") == (198, 45, 66)
 assert hex_to_rgb("C62D42") == (198, 45, 66)
-assert hex_to_rgb(0xC62D42) == (198, 45, 66)
+assert hex_to_rgb(SAMPLE_RED_HEX) == (198, 45, 66)
 
 # A type alias gives a repeated shape a name but creates no runtime type. This
 # resembles a TypeScript type alias. NamedTuple creates a tuple subclass with
@@ -50,6 +59,9 @@ def rgb_tuple_to_hsl(color: RGBTuple) -> HSLTuple:
     return (0.0, 0.0, lightness)
 
 
+# In a call, * unpacks an iterable into separate positional arguments; it is not
+# a reference marker. The direct TS equivalent is `new RGB(...hexToRgb("C62D42"))`;
+# this repository's helper instead accepts the tuple itself via `makeNamedTuple`.
 assert RGB(*hex_to_rgb("C62D42")) == RGB(red=198, green=45, blue=66)
 assert rgb_tuple_to_hsl((128, 128, 128)) == (0.0, 0.0, 128 / 255)
 
@@ -156,6 +168,9 @@ def wind_chill_temperature(temperature_c: float, wind_kph: float) -> float:
     )
 
 
+# Here * is a signature separator: every parameter after it must be passed by
+# keyword. It consumes no argument and is unrelated to TS null or undefined.
+# TS has no keyword arguments; the sibling uses one typed options object.
 def write_wind_chill_table(
     *,
     start_temperature: int,
