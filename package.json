@@ -9,6 +9,7 @@
     "chapter:01:ts": "node chapter-01/numbers-strings-tuples.ts",
     "chapter:02:ts": "node chapter-02/statements-and-syntax.ts",
     "chapter:03:ts": "node chapter-03/function-definitions.ts",
+    "chapter:04:ts": "node chapter-04/lists-and-sets.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"

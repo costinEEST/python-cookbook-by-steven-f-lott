@@ -302,6 +302,7 @@ assert content_match.group(1).strip() == "No warnings"
 # 1.9 Using tuples of items
 # -------------------------
 # A tuple is an immutable fixed-size grouping: (x, y), (r, g, b), etc. The
+# tuple cannot replace, add, or remove its references after construction. The
 # comma creates it, which is why a singleton requires a trailing comma.
 # JS has no tuple runtime primitive. A TypeScript tuple such as `[string,
 # number]` describes a JavaScript array and is mutable unless declared readonly;
@@ -323,6 +324,14 @@ assert len(t) == 3
 assert t.count("2") == 1
 assert t.index("cups") == 2
 assert "Rice" not in t
+
+# Tuple immutability is shallow: a tuple may refer to a mutable object. The
+# tuple still points to the same list when that list changes. Assignment binds
+# names to objects; it does not recursively copy the object graph.
+mutable_ingredients = ["Rice"]
+menu = ("Dinner", mutable_ingredients)
+assert mutable_ingredients.append("Beans") is None
+assert menu == ("Dinner", ["Rice", "Beans"])
 
 
 # 1.10 Using NamedTuple to simplify item access

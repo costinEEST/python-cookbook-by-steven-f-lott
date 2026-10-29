@@ -319,6 +319,48 @@ export function splitSeconds(totalSeconds: number): readonly [number, number, nu
   return [hours, minutes, seconds];
 }
 
+/**
+ * @param left - First input set.
+ * @param right - Second input set.
+ * @returns A new set containing every member found in either input, like Python's `|`.
+ */
+export function setUnion<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): Set<T> {
+  return new Set([...left, ...right]);
+}
+
+/**
+ * @param left - First input set.
+ * @param right - Second input set.
+ * @returns A new set containing members shared by both inputs, like Python's `&`.
+ */
+export function setIntersection<T>(
+  left: ReadonlySet<T>,
+  right: ReadonlySet<T>,
+): Set<T> {
+  return new Set([...left].filter((value) => right.has(value)));
+}
+
+/**
+ * @param left - Set from which members are selected.
+ * @param right - Set whose members are excluded.
+ * @returns A new set containing members found only in `left`, like Python's `-`.
+ */
+export function setDifference<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): Set<T> {
+  return new Set([...left].filter((value) => !right.has(value)));
+}
+
+/**
+ * @param left - First input set.
+ * @param right - Second input set.
+ * @returns A new set containing members found in exactly one input, like Python's `^`.
+ */
+export function setSymmetricDifference<T>(
+  left: ReadonlySet<T>,
+  right: ReadonlySet<T>,
+): Set<T> {
+  return setUnion(setDifference(left, right), setDifference(right, left));
+}
+
 /** @param value - Number to round. @param digits - Decimal places to retain. @returns The rounded number. */
 export function roundTo(value: number, digits: number): number {
   const factor = 10 ** digits;

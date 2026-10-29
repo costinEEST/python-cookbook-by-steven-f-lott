@@ -388,14 +388,16 @@ def waypoint_distances(source: TextIO) -> list[float]:
         return []
     distances: list[float] = []
     for point in reader:
-        distances.append(
-            nautical_haversine(
-                float(start["lat"]),
-                float(start["lon"]),
-                float(point["lat"]),
-                float(point["lon"]),
-            )
+        distance = nautical_haversine(
+            float(start["lat"]),
+            float(start["lon"]),
+            float(point["lat"]),
+            float(point["lon"]),
         )
+        # append() mutates the one distances list and returns None. It stores a
+        # reference to distance; assignment to start below merely rebinds that
+        # local name and does not mutate either row dictionary.
+        assert distances.append(distance) is None
         start = point
     return distances
 
