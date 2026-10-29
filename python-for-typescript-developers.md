@@ -2,7 +2,7 @@
 
 A syntax cheatsheet, terminology guide, and learning path for developers who already know modern TypeScript. Python examples target Python 3.12 or newer.
 
-This is a memory aid, not a substitute for the executable notes. Chapters 1–5 summarize the material currently in this repository. Chapters 6–17 are a roadmap and will gain verified examples as their notes are added.
+This is a memory aid, not a substitute for the executable notes. Chapters 1–6 summarize the material currently in this repository. Chapters 7–17 are a roadmap and will gain verified examples as their notes are added.
 
 ## How to use this reference
 
@@ -149,12 +149,14 @@ while chunk := stream.read(1024):
     consume(chunk)
 ```
 
-Use `with` for deterministic cleanup—the role often served by `try/finally` in TypeScript:
+Use `with` for deterministic cleanup:
 
 ```python
 with open("data.txt", encoding="utf-8") as source:
     text = source.read()
 ```
+
+Modern ECMAScript explicit resource management provides the closest direct analogue: a `using` binding calls the resource's `[Symbol.dispose]()` method on normal or exceptional scope exit. Python context managers additionally receive exception details and may suppress an exception.
 
 #### Chapter 3: Function Definitions
 
@@ -223,7 +225,7 @@ left.add(5)  # mutates; returns None
 empty = set()  # {} would be an empty dict
 ```
 
-Python does not promise a useful set iteration order. Elements must be hashable, so a list cannot be a set member; TypeScript `Set` accepts objects and compares them by identity.
+Python does not promise a useful set iteration order. Elements must be hashable, so a list cannot be a set member; TypeScript `Set` accepts objects and compares them by identity. Modern ECMAScript supplies non-mutating `union()`, `intersection()`, `difference()`, and `symmetricDifference()` methods directly on `Set`.
 
 Assignment creates aliases. A shallow copy creates a new outer collection but shares nested objects; `copy.deepcopy()` recursively copies an object graph when that is actually needed.
 
@@ -266,13 +268,40 @@ class User(TypedDict):
 
 `TypedDict` describes a fixed dictionary shape to static checkers, similarly to a TypeScript interface. It creates no runtime validator or new dictionary class.
 
+#### Chapter 6: User Inputs and Outputs
+
+[Python notes](chapter-06/user-inputs-and-outputs.py) · [TypeScript notes](chapter-06/user-inputs-and-outputs.ts)
+
+`print()` converts values to text, inserts `sep`, appends `end`, and writes to a text stream selected with `file`:
+
+```python
+print("date", "2024-02-29", sep="=", end=", ")
+print("valid", True, sep="=")
+# date=2024-02-29, valid=True
+```
+
+JavaScript's `console.log()` does not expose separator or terminator parameters. Build text with template literals or `join()`, use `Writable.write()` when newline control matters, and construct a Node `Console` with explicit `stdout`/`stderr` writable streams for Python-like output routing.
+
+Keep acquisition, conversion, composite validation, and domain work separate. `input()` and `getpass.getpass()` return strings; conversion such as `int(text)` can raise `ValueError`, and constructing the final object can apply additional rules. Node's stable `node:readline/promises` API provides asynchronous `question()` and async line iteration. It has no built-in `getpass` equivalent: hiding terminal echo still requires TTY handling or a library, and hidden input must not enter history or logs.
+
+Debug f-strings reproduce both an expression and its result:
+
+```python
+mean = 12.345
+debug = f"{mean=:.2f}"  # "mean=12.35"
+```
+
+Template literals evaluate expressions but do not reproduce their source, so TypeScript needs an explicit label.
+
+For command-line programs, let `argparse` provide conventional positional/options syntax, choices, conversion, help, and error exits. Pass an explicit argument list to make parsing testable, and keep the resulting UI adapter separate from reusable domain functions. Node's stable `node:util.parseArgs()` handles option aliases, defaults, strict option checking, and positionals; applications still add choices, conversion, generated help, and exit behavior.
+
+`cmd.Cmd` builds a stateful REPL by dispatching a command such as `roll` to `do_roll()`. Method docstrings become help, and truthy returns end the loop. Node's `readline/promises` handles the stream-backed loop, prompts, async iteration, history, completion, abort signals, and disposal, but the application must provide command dispatch and help metadata. For Invoke-like wrappers, Node's `child_process.spawn()` supplies subprocess, standard-stream, and environment control.
+
+Environment variables are string-valued, slowly changing defaults. Validate them, let explicit CLI arguments override them, and inject a mapping in tests instead of mutating global `os.environ`/`process.env`.
+
 ### Stage 2 — Interfaces and object design
 
 The following chapters are roadmap entries. Their summaries will be replaced with verified syntax and TypeScript comparisons when their paired notes are added.
-
-#### Chapter 6: User Inputs and Outputs
-
-Planned focus: `input()`, `print()`, format specifications, command-line arguments, text streams, and the boundary between Unicode text and bytes.
 
 #### Chapter 7: Basics of Classes and Objects
 

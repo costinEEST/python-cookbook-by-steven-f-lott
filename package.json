@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=23.6"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "chapter:01:ts": "node chapter-01/numbers-strings-tuples.ts",
@@ -11,6 +11,7 @@
     "chapter:03:ts": "node chapter-03/function-definitions.ts",
     "chapter:04:ts": "node chapter-04/lists-and-sets.ts",
     "chapter:05:ts": "node chapter-05/dictionaries.ts",
+    "chapter:06:ts": "node chapter-06/user-inputs-and-outputs.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"

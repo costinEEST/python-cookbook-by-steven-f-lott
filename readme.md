@@ -16,6 +16,7 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 - Chapter 3: Function Definitions — [Python](chapter-03/function-definitions.py) · [TypeScript](chapter-03/function-definitions.ts)
 - Chapter 4: Built-In Data Structures Part 1: Lists and Sets — [Python](chapter-04/lists-and-sets.py) · [TypeScript](chapter-04/lists-and-sets.ts)
 - Chapter 5: Built-In Data Structures Part 2: Dictionaries — [Python](chapter-05/dictionaries.py) · [TypeScript](chapter-05/dictionaries.ts)
+- Chapter 6: User Inputs and Outputs — [Python](chapter-06/user-inputs-and-outputs.py) · [TypeScript](chapter-06/user-inputs-and-outputs.ts)
 
 ## Python for TypeScript reference
 
