@@ -38,7 +38,7 @@ The Python side is deliberately a uv project that is not built or published as a
 
 - `.python-version` selects Python 3.12 for uv;
 - `pyproject.toml` declares the Python requirement, runtime and development dependencies, Ruff rules, ty scope, and `package = false`;
-- `uv.lock` pins Pydantic, Ruff, ty, and their transitive dependencies across supported platforms;
+- `uv.lock` pins Beautiful Soup, Pydantic, Ruff, ty, and their transitive dependencies across supported platforms;
 - `.venv/` is uv's generated local environment and remains ignored.
 
 The TypeScript side remains an npm project:
@@ -52,6 +52,7 @@ Commit both lockfiles. Do not commit `.venv/` or `node_modules/`.
 
 ## Why each Python dependency is needed
 
+- **Beautiful Soup** is a runtime dependency for Chapter 11. It supplies the tolerant, searchable tree and CSS-query API used to extract tabular data; the example explicitly selects Python's standard-library `html.parser` as its parsing backend. Using `html.parser` directly would require building and querying the tree ourselves because its API is event based. Beautiful Soup can use other backends such as `lxml`, but malformed HTML may produce a different tree under a different parser, so the backend is named rather than left implicit.
 - **Pydantic** is a runtime dependency for Chapter 10. It interprets annotations to convert and validate external data and provides JSON serialization and JSON Schema generation. Standard-library annotations are not enforced at runtime, and `dataclasses` do not perform equivalent conversion or validation.
 - **Ruff** is a development dependency that supplies linting, import sorting, and formatting with one repository-wide configuration. The standard library does not provide an equivalent quality tool.
 - **ty** is a development dependency that performs static type checking and supplies the VS Code language-server integration. `py_compile` checks whether code can be compiled, but it does not verify type correctness.

@@ -22,6 +22,7 @@ Executable chapter summaries for learning [Python 3.12](https://docs.python.org/
 - Chapter 8: More Advanced Class Design — [Python](chapter-08/more-advanced-class-design.py) · [TypeScript](chapter-08/more-advanced-class-design.ts)
 - Chapter 9: Functional Programming Features — [Python](chapter-09/functional-programming-features.py) · [TypeScript](chapter-09/functional-programming-features.ts)
 - Chapter 10: Working with Type Matching and Annotations — [Python](chapter-10/type-matching-and-annotations.py) · [TypeScript](chapter-10/type-matching-and-annotations.ts)
+- Chapter 11: Input/Output, Physical Format, and Logical Layout — [Python](chapter-11/input-output-physical-format-logical-layout.py) · [TypeScript](chapter-11/input-output-physical-format-logical-layout.ts)
 
 ## Python for TypeScript reference
 

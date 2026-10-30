@@ -16,6 +16,7 @@
     "chapter:08:ts": "node chapter-08/more-advanced-class-design.ts",
     "chapter:09:ts": "node chapter-09/functional-programming-features.ts",
     "chapter:10:ts": "node chapter-10/type-matching-and-annotations.ts",
+    "chapter:11:ts": "node chapter-11/input-output-physical-format-logical-layout.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"

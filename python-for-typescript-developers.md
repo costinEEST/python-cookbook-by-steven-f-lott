@@ -2,7 +2,7 @@
 
 A syntax cheatsheet, terminology guide, and learning path for developers who already know modern TypeScript. Python examples target Python 3.12 or newer.
 
-This is a memory aid, not a substitute for the executable notes. Chapters 1–9 summarize the material currently in this repository. Chapters 10–17 are a roadmap and will gain verified examples as their notes are added.
+This is a memory aid, not a substitute for the executable notes. Chapters 1–11 summarize the material currently in this repository. Chapters 12–17 are a roadmap and will gain verified examples as their notes are added.
 
 ## How to use this reference
 
@@ -440,7 +440,28 @@ Pydantic `BaseModel` uses annotations at runtime to convert and validate externa
 
 #### Chapter 11: Input/Output, Physical Format, and Logical Layout
 
-Planned focus: paths, files, context managers, CSV, JSON, serialization, logical records, encodings, and safe resource handling.
+[Python notes](chapter-11/input-output-physical-format-logical-layout.py) · [TypeScript notes](chapter-11/input-output-physical-format-logical-layout.ts)
+
+Use `pathlib.Path` for lexical path transformations and concrete filesystem work:
+
+```python
+source = Path("data/waypoints.csv")
+target = (source.parent / f"{source.stem}_clean").with_suffix(".csv")
+matches = sorted(source.parent.glob("*.csv"))
+```
+
+Node splits these responsibilities between `node:path` and `node:fs`. Building a path in either language does not create the resource. For failure-safe replacement, completely write and close a sibling temporary file before renaming; a backup file is the recovery point because several renames are not one transaction.
+
+Physical format and logical layout are separate concerns. `csv.DictReader` handles delimiters, quoting, and doubled quotes, but returns strings; a second boundary step converts columns into useful types. A raw dataclass can mirror the external schema while an application dataclass computes coordinates and timestamps. TypeScript interfaces are erased, so equivalent conversion needs explicit runtime checks.
+
+```python
+rows = csv.DictReader(source_file)
+waypoints = (Waypoint(RawRow(**row)) for row in rows)
+```
+
+Named regex groups plus `groupdict()` make irregular-but-flat log records resemble dictionary rows. Reject a non-match explicitly. Use format-aware tree parsers—not regex—for recursive XML and tolerant HTML: ElementTree supplies an XPath subset, while Beautiful Soup supplies the searchable tree and CSS-query API over an explicitly selected parsing backend. The Chapter 11 example uses the standard-library `html.parser`; changing backends can change the repaired tree for malformed HTML.
+
+`json.loads()` maps objects, arrays, strings, numbers, booleans, and `null` to Python values; JavaScript's `JSON.parse()` returns the native equivalents directly. Python's `default` and `object_hook` callbacks can encode and restore tagged complex values. JavaScript `Date.toJSON()` runs before a `JSON.stringify()` replacer, an important ordering difference. JSON is valid YAML, but general YAML needs a separate parser.
 
 #### Chapter 12: Graphics and Visualization with Jupyter Lab
 
