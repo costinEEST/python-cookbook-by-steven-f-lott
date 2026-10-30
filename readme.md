@@ -1,6 +1,6 @@
 # Modern Python Cookbook study notes
 
-Executable chapter summaries for learning Python from Steven F. Lott's _Modern Python Cookbook, Third Edition_ as a JavaScript and TypeScript developer. Each Python chapter is paired with a TypeScript implementation of the same examples and assertions.
+Executable chapter summaries for learning [Python 3.12](https://docs.python.org/3/whatsnew/3.12.html) from [Steven F. Lott](https://github.com/slott56)'s _Modern Python Cookbook, Third Edition_ as a JavaScript and TypeScript developer. Each Python chapter is paired with a TypeScript implementation of the same examples and assertions.
 
 ## Table of contents
 
@@ -8,6 +8,7 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 - [Python for TypeScript reference](#python-for-typescript-reference)
 - [Development and execution](#development-and-execution)
 - [Book resources](#book-resources)
+- [More books by Steven F. Lott](#more-books-by-steven-f-lott)
 
 ## Chapters
 
@@ -19,6 +20,7 @@ Executable chapter summaries for learning Python from Steven F. Lott's _Modern P
 - Chapter 6: User Inputs and Outputs — [Python](chapter-06/user-inputs-and-outputs.py) · [TypeScript](chapter-06/user-inputs-and-outputs.ts)
 - Chapter 7: Basics of Classes and Objects — [Python](chapter-07/basics-of-classes-and-objects.py) · [TypeScript](chapter-07/basics-of-classes-and-objects.ts)
 - Chapter 8: More Advanced Class Design — [Python](chapter-08/more-advanced-class-design.py) · [TypeScript](chapter-08/more-advanced-class-design.ts)
+- Chapter 9: Functional Programming Features — [Python](chapter-09/functional-programming-features.py) · [TypeScript](chapter-09/functional-programming-features.ts)
 
 ## Python for TypeScript reference
 
@@ -40,3 +42,11 @@ See [Development tooling](tooling.md) for:
 
 - [Publisher's book page](https://www.packtpub.com/en-ro/product/modern-python-cookbook-9781835460757)
 - [Official example repository](https://github.com/PacktPublishing/Modern-Python-Cookbook-Third-Edition)
+
+## More books by Steven F. Lott
+
+- [_Unlearning SQL, Revised_](https://slott56.github.io/2024-08-20-unlearning_sql.html)
+- [_Unlearning Shell Scripting: When Your Only Tool Is a Hammer, Every Problem Looks Like a Nail_](https://www.amazon.com/Unlearning-Shell-Scripting-hammer-problem-ebook/dp/B0H967ZY2F)
+- [_Python Object-Oriented Programming_](https://www.packtpub.com/en-ro/product/python-object-oriented-programming-9781836642589)
+- [_Functional Python Programming_](https://www.packtpub.com/en-ro/product/functional-python-programming-9781803236568)
+- [_Python Real-World Projects_](https://www.packtpub.com/en-ro/product/python-real-world-projects-9781804614969)
