@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import operator
 import re
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator
@@ -83,6 +84,27 @@ counter_histogram = Counter(
     record[3] for record in log_records if record[3].startswith("path")
 )
 assert counter_histogram == histogram
+
+# Sorting a dictionary representation by value
+# ----------------------------------------------
+# items() is a dynamic view of (key, value) tuples. sorted() consumes that view
+# and returns a new list; it neither mutates xs nor returns another dictionary.
+xs = {"a": 4, "b": 3, "c": 2, "d": 1}
+items_by_value = sorted(xs.items(), key=lambda item: item[1])
+assert items_by_value == [("d", 1), ("c", 2), ("b", 3), ("a", 4)]
+assert xs == {"a": 4, "b": 3, "c": 2, "d": 1}
+
+# The key function runs once per tuple. lambda item: item[1] selects its value;
+# itemgetter(1) constructs a reusable callable that performs the same lookup.
+assert sorted(xs.items(), key=operator.itemgetter(1)) == items_by_value
+
+# Python's sort is stable: equal values retain the dictionary's insertion order.
+scores = {"first": 2, "second": 1, "third": 2}
+assert sorted(scores.items(), key=operator.itemgetter(1)) == [
+    ("second", 1),
+    ("first", 2),
+    ("third", 2),
+]
 
 
 # 5.2 Shrinking dictionaries: pop() and del

@@ -40,7 +40,8 @@ Produce concise, executable notes that accurately represent the supplied source 
 - Keep Markdown prose unwrapped: use one source line per logical paragraph or list item, while preserving headings, blank lines, code fences, and tables. Do not impose a prose column limit.
 - Organize content in source order and make coverage auditable with section labels matching the chapter recipes.
 - Use comments and docstrings for theory, runnable statements for demonstrations, and assertions for stable invariants.
-- Label clarifications that go beyond the source. Correct genuine source ambiguities without silently attributing the correction to the book.
+- Add code snippets at any point when they help explain a Python quirk, semantic edge case, implementation detail, or other inner working, even when the material is not part of the book. Integrate these snippets naturally into the most relevant chapter and mirror them in TypeScript when applicable; they do not need a supplementary-example or external-provenance label.
+- Correct genuine source ambiguities and do not falsely attribute independent explanations or examples to the book.
 - Keep examples deterministic and side-effect-free by default. Replace live downloads and file writes with in-memory equivalents unless external I/O is the lesson or the user requests it.
 
 ## Teach from a JavaScript and TypeScript perspective

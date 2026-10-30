@@ -81,6 +81,32 @@ for (const [, , , details] of logRecords.filter((record) =>
 }
 assert.deepEqual(counterHistogram, histogram);
 
+// Sorting a dictionary representation by value
+// ----------------------------------------------
+// Object.entries() creates [key, value] pairs. toSorted() returns a new array,
+// while its comparator orders pairs by index 1, the value. The source object is
+// unchanged. This parallels sorted(xs.items(), key=lambda item: item[1]).
+const xs = { a: 4, b: 3, c: 2, d: 1 };
+const itemsByValue = Object.entries(xs).toSorted((left, right) => left[1] - right[1]);
+assert.deepEqual(itemsByValue, [
+  ["d", 1],
+  ["c", 2],
+  ["b", 3],
+  ["a", 4],
+]);
+assert.deepEqual(xs, { a: 4, b: 3, c: 2, d: 1 });
+
+// ECMAScript sorting is stable too, so equal values retain entry order.
+const scores = { first: 2, second: 1, third: 2 };
+assert.deepEqual(
+  Object.entries(scores).toSorted((left, right) => left[1] - right[1]),
+  [
+    ["second", 1],
+    ["first", 2],
+    ["third", 2],
+  ],
+);
+
 // 5.2 Shrinking dictionaries: pop() and del
 // --------------------------------------------
 function requestBatches(source: readonly string[]): LogRecord[][] {

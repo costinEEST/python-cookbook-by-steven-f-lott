@@ -250,6 +250,18 @@ merged = scores | {"Ada": 11}  # new dict; right side wins
 
 `in` checks keys, not values. A Python `dict` is often like a JavaScript `Map`; a string-keyed object is also a useful analogy, but Python keys are not coerced to strings.
 
+To get a value-sorted representation, sort the dictionary's item view with a key function:
+
+```python
+import operator
+
+scores = {"a": 4, "b": 3, "c": 2, "d": 1}
+by_value = sorted(scores.items(), key=operator.itemgetter(1))
+# [("d", 1), ("c", 2), ("b", 3), ("a", 4)]
+```
+
+`.items()` supplies `(key, value)` tuples and `itemgetter(1)` selects tuple index 1 as each comparison key. The equivalent `lambda item: item[1]` is often easier to read inline. `sorted()` returns a new list and leaves the insertion-ordered dictionary unchanged; equal values retain their original order because Python sorting is stable. For a string-keyed TypeScript object, use `Object.entries(scores).toSorted((left, right) => left[1] - right[1])`.
+
 Use specialized mapping shapes deliberately:
 
 ```python
