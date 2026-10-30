@@ -465,7 +465,26 @@ Named regex groups plus `groupdict()` make irregular-but-flat log records resemb
 
 #### Chapter 12: Graphics and Visualization with Jupyter Lab
 
-Planned focus: notebook execution, cells and kernel state, reproducibility, tabular data, plotting, visualization choices, and exporting results.
+[Python notes](chapter-12/graphics-and-visualization-with-jupyter-lab.py) · [TypeScript notes](chapter-12/graphics-and-visualization-with-jupyter-lab.ts)
+
+A notebook is an ordered document of code and Markdown cells backed by a stateful kernel. Executing a cell mutates one shared namespace, so rerunning cells out of order can leave stale definitions. Restart the kernel and run all cells before trusting or publishing the result—the closest TypeScript comparison is a long-lived REPL, not a fresh module execution.
+
+Validate external data at ingestion. Pydantic models provide runtime conversion in Python; a TypeScript `interface` is erased, so the sibling uses explicit guards. Prefer a mapping keyed by a meaningful series name over relying on list positions.
+
+Matplotlib has two useful layers. `pyplot` keeps implicit current-figure state and is convenient for quick exploration; explicit `Figure` and `Axes` objects make multi-panel layouts and annotations easier to reason about:
+
+```python
+figure = plt.figure(layout="tight")
+axes = figure.subplot_mosaic([["I", "II"], ["III", "IV"]])
+for name, axis in axes.items():
+    series = quartet[name]
+    axis.scatter(series.x, series.y)
+    axis.set_title(f"Series {name}")
+```
+
+JavaScript and Node have no standard plotting API. The TypeScript notes build a checked, declarative plot model; a browser or plotting library would still be required to render it. Correlation and a fitted line can be identical across datasets with radically different shapes, so visualization is part of model checking, not decoration.
+
+Computed Markdown can combine an `rf"..."` string with notebook display machinery. The `r` preserves LaTeX backslashes and `f` interpolates values. Keep ingestion and calculation in functions, add assertions (using `math.isclose()` for floats), and execute the whole notebook headlessly in automation. Generate reports or slides from the notebook rather than copying computed results into a second document.
 
 #### Chapter 13: Application Integration: Configuration
 

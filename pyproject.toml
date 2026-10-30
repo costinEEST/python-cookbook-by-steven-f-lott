@@ -8,6 +8,9 @@ dependencies = [
     # the standard-library html.parser backend. html.parser alone is event based
     # and does not provide an equivalent DOM-style extraction interface.
     "beautifulsoup4>=4.14.0",
+    # Chapter 12 uses Matplotlib's real Figure/Axes object model and a
+    # non-interactive backend. Python's standard library has no plotting API.
+    "matplotlib>=3.10.0",
     # Chapter 10 uses Pydantic for annotation-driven runtime conversion,
     # validation, JSON serialization, and JSON Schema generation. Python's
     # standard-library annotations and dataclasses do not provide these features.
