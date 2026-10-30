@@ -2,7 +2,7 @@
 
 A syntax cheatsheet, terminology guide, and learning path for developers who already know modern TypeScript. Python examples target Python 3.12 or newer.
 
-This is a memory aid, not a substitute for the executable notes. Chapters 1–6 summarize the material currently in this repository. Chapters 7–17 are a roadmap and will gain verified examples as their notes are added.
+This is a memory aid, not a substitute for the executable notes. Chapters 1–9 summarize the material currently in this repository. Chapters 10–17 are a roadmap and will gain verified examples as their notes are added.
 
 ## How to use this reference
 
@@ -381,7 +381,30 @@ When deleting matching list items in place, do not advance the index after `del 
 
 #### Chapter 9: Functional Programming Features
 
-Planned focus: first-class callables, iterators, generators, comprehensions, `map()`, `filter()`, reductions, closures, decorators, and `functools`/`itertools` tools.
+[Python notes](chapter-09/functional-programming-features.py) · [TypeScript notes](chapter-09/functional-programming-features.ts)
+
+A generator function contains `yield`; calling it creates a lazy, one-shot iterator. Work happens only when `next()`, a `for` loop, or a consumer asks for a value. Generator expressions, `map()`, and `filter()` are lazy too:
+
+```python
+squares = (value * value for value in source if value >= 0)
+parsed = map(parse_row, rows)
+valid = filter(is_valid, parsed)
+```
+
+JavaScript generator functions share the one-shot, demand-driven model, and `yield*` corresponds to Python's `yield from`. JavaScript `Array.map()` and `Array.filter()` are eager, however; use generator helpers when laziness matters.
+
+Keep mapping and filtering rules as small named functions when they need type hints, tests, or statements such as `try`/`except`. Stack iterators into pipelines, but remember that consuming an iterator exhausts it. Materialize a `tuple` or `list` before multiple summaries; `itertools.tee()` may retain a large buffer when consumers advance unevenly.
+
+Use specialized reductions such as `sum()`, `min()`, `max()`, `math.prod()`, `any()`, and `all()` when possible. Identity values make empty inputs well-defined: `sum([]) == 0` and `math.prod([]) == 1`. `any()` and `all()` short-circuit like JavaScript `some()` and `every()`.
+
+`functools.partial()` binds supplied argument objects immediately. A closure normally resolves a free name when called; capture the current Python value with a default argument when that distinction matters:
+
+```python
+fixed = partial(standardize, mean, stdev)
+frozen = lambda value, offset=offset: value + offset
+```
+
+`Function.bind()` is JavaScript's closest built-in partial-application tool. Recursive generators use `yield from` to delegate values without building intermediate lists, which is useful for depth-first traversal of nested JSON-like structures.
 
 #### Chapter 10: Working with Type Matching and Annotations
 

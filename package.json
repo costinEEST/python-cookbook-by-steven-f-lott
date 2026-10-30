@@ -14,6 +14,7 @@
     "chapter:06:ts": "node chapter-06/user-inputs-and-outputs.ts",
     "chapter:07:ts": "node chapter-07/basics-of-classes-and-objects.ts",
     "chapter:08:ts": "node chapter-08/more-advanced-class-design.ts",
+    "chapter:09:ts": "node chapter-09/functional-programming-features.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
