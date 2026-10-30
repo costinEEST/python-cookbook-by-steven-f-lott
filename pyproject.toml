@@ -3,11 +3,20 @@ name = "python-cookbook-notes"
 version = "0.1.0"
 description = "Paired executable Python and TypeScript notes for Modern Python Cookbook"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    # Chapter 10 uses Pydantic for annotation-driven runtime conversion,
+    # validation, JSON serialization, and JSON Schema generation. Python's
+    # standard-library annotations and dataclasses do not provide these features.
+    "pydantic>=2.12.0",
+]
 
 [dependency-groups]
 dev = [
+    # Ruff supplies linting, import sorting, and formatting; these quality checks
+    # have no equivalent unified tool in the Python standard library.
     "ruff>=0.14.0",
+    # ty performs static type checking and powers the editor integration.
+    # py_compile checks syntax/bytecode compilation, not type correctness.
     "ty==0.0.93",
 ]
 

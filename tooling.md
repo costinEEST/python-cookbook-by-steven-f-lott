@@ -37,8 +37,8 @@ These commands are intentionally shell-neutral. They do not use virtual-environm
 The Python side is deliberately a uv project that is not built or published as a package:
 
 - `.python-version` selects Python 3.12 for uv;
-- `pyproject.toml` declares the Python requirement, development tools, Ruff rules, ty scope, and `package = false`;
-- `uv.lock` pins Ruff and ty across supported platforms;
+- `pyproject.toml` declares the Python requirement, runtime and development dependencies, Ruff rules, ty scope, and `package = false`;
+- `uv.lock` pins Pydantic, Ruff, ty, and their transitive dependencies across supported platforms;
 - `.venv/` is uv's generated local environment and remains ignored.
 
 The TypeScript side remains an npm project:
@@ -49,6 +49,14 @@ The TypeScript side remains an npm project:
 - `typescript/python-compat.ts` contains dependency-free Python compatibility helpers shared by chapter files.
 
 Commit both lockfiles. Do not commit `.venv/` or `node_modules/`.
+
+## Why each Python dependency is needed
+
+- **Pydantic** is a runtime dependency for Chapter 10. It interprets annotations to convert and validate external data and provides JSON serialization and JSON Schema generation. Standard-library annotations are not enforced at runtime, and `dataclasses` do not perform equivalent conversion or validation.
+- **Ruff** is a development dependency that supplies linting, import sorting, and formatting with one repository-wide configuration. The standard library does not provide an equivalent quality tool.
+- **ty** is a development dependency that performs static type checking and supplies the VS Code language-server integration. `py_compile` checks whether code can be compiled, but it does not verify type correctness.
+
+Dependency declarations in `pyproject.toml` include adjacent comments explaining their role and why the standard library or an existing dependency is insufficient. Keep those comments and this section synchronized when dependencies are added, replaced, or removed. Generated transitive dependencies belong only in `uv.lock` and do not need individual explanations.
 
 ## Why the project uses uv and ty
 

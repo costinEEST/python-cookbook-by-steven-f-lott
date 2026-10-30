@@ -408,7 +408,33 @@ frozen = lambda value, offset=offset: value + offset
 
 #### Chapter 10: Working with Type Matching and Annotations
 
-Planned focus: structural pattern matching, unions, narrowing, generics, protocols, `Callable`, `TypeVar`, and what Python annotations do—and do not do—at runtime.
+[Python notes](chapter-10/type-matching-and-annotations.py) · [TypeScript notes](chapter-10/type-matching-and-annotations.ts)
+
+Python annotations are optional metadata used by static analyzers; they do not validate arguments or change runtime dispatch. This resembles TypeScript's erased types. Use a Python 3.12 `type` statement for a readable alias and `|` for a union:
+
+```python
+type Content = Path | Referenced
+```
+
+`isinstance(value, Class)` narrows an object at runtime and includes subclasses; `issubclass(Child, Parent)` examines class objects. TypeScript normally narrows with `typeof`, `instanceof`, property checks, or a discriminant field.
+
+Python's `match` performs structural pattern matching. Class, sequence, mapping, literal, wildcard, and guarded patterns can validate shape and bind names in one operation. Cases run top to bottom, so put specific patterns before general ones:
+
+```python
+match item:
+    case Referenced(_, [Path()]) as single:
+        handle_single(single)
+    case Referenced() as referenced:
+        handle_referenced(referenced)
+    case _:
+        raise TypeError(item)
+```
+
+JavaScript/TypeScript has no equivalent built-in structural `match`; use explicit guards. Python patterns do not call constructors: `case Referenced()` tests the class and `case float(value)` both tests and binds.
+
+Keep conversion at a boundary and computation in a typed core. `float()` parses numeric strings; `ast.literal_eval()` accepts Python literal structures but is unnecessary when a simpler format-specific parser will do. Validate the resulting shape as well as the syntax.
+
+Pydantic `BaseModel` uses annotations at runtime to convert and validate external data, and can emit JSON and JSON Schema. A standard `@dataclass` does neither automatically. This is closer to a TypeScript schema validator than to an `interface`: an `interface` disappears at runtime, so TypeScript needs explicit parsing and validation for untrusted values.
 
 ### Stage 4 — Data, visualization, and applications
 
