@@ -32,7 +32,7 @@ Executable chapter summaries for learning [Python 3.12](https://docs.python.org/
 
 ## Python for TypeScript reference
 
-Use the [Python for TypeScript Developers cheatsheet](python-for-typescript-developers.md) as a quick syntax reference, terminology guide, and 17-chapter learning path. It is expanded whenever a new chapter is added.
+Use the [Python for TypeScript Developers cheatsheet](python-for-typescript-developers.md) as a quick syntax reference, terminology guide, 17-chapter learning path, and chapter-mapped index of the Python Enhancement Proposals behind the examples.
 
 ## Development and execution
 

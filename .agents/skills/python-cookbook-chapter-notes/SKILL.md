@@ -15,6 +15,20 @@ Produce concise, executable notes that accurately represent the supplied source 
 - Preserve the 17-chapter learning path and its exact chapter titles. Keep the root `readme.md` link to the reference and add new chapter file links to both files when a chapter is added.
 - Use these sites as structural inspiration, not text to copy: [Programming Idioms Python/JavaScript cheatsheet](https://programming-idioms.org/cheatsheet/Python/JS) for task-oriented, side-by-side runtime comparisons, [Python Morsels terminology](https://www.pythonmorsels.com/terms/) for approachable definitions, and [Real Python learning paths](https://realpython.com/learning-paths/) for staged organization.
 
+## Keep every relevant PEP documented
+
+- Treat PEP coverage as part of chapter coverage, not as optional background. Whenever chapter material uses, teaches, or explicitly mentions a feature, convention, or packaging standard defined by a Python Enhancement Proposal, document that PEP in the `PEP index for the executable chapters` section of `python-for-typescript-developers.md` in the same change.
+- Audit both explicit references such as `PEP 557` and implicit uses such as `@dataclass`, `match`/`case`, `yield from`, positional-only parameters, `Protocol`, `venv`, or `[dependency-groups]`. Do not limit the audit to text containing the word `PEP`.
+- Give each PEP one canonical index row with:
+  - its number, official title, and a direct `https://peps.python.org/pep-NNNN/` link;
+  - every chapter that uses, teaches, or explicitly mentions it;
+  - a concise explanation of what the PEP contributes to the material;
+  - the nearest TypeScript, JavaScript, or Node.js comparison, including the important semantic difference.
+- Update an existing row instead of creating a duplicate when another chapter uses the same PEP. Remove a chapter mapping when the last corresponding use is removed, and remove the row when the repository no longer uses or mentions that PEP anywhere.
+- Distinguish proposal history from current behavior. State when a relevant PEP is rejected, withdrawn, superseded, provisional, or informational; do not present it as the governing standard. For accepted language features, use the current Python language or standard-library documentation to resolve behavior when it differs from the historical proposal.
+- Keep the index scoped to substantive taught behavior and project standards. Do not mechanically catalog implementation-only PEPs merely because the interpreter relies on them, or historical PEPs that do not help explain the chapter material.
+- Before handoff, search all chapter files and the root reference case-insensitively for explicit PEP numbers and confirm that each number has a canonical index row. Then review the changed recipes for implicit PEP-defined features that a text search cannot find.
+
 ## Establish the source and scope
 
 - When a request includes URLs, open each URL with the Chrome MCP before relying on its content. Inspect the rendered page and its relevant headings, tables, examples, or article body; a search result or indexed excerpt does not count as opening the URL.
