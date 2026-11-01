@@ -8,7 +8,7 @@ from io import StringIO
 from math import asin, cos, prod, radians, sin, sqrt
 from pathlib import Path
 from random import Random
-from typing import NamedTuple, TextIO
+from typing import NamedTuple, TextIO, TypedDict
 
 # 3.1 Function parameters and type hints
 # ---------------------------------------
@@ -64,6 +64,33 @@ def rgb_tuple_to_hsl(color: RGBTuple) -> HSLTuple:
 # this repository's helper instead accepts the tuple itself via `makeNamedTuple`.
 assert RGB(*hex_to_rgb("C62D42")) == RGB(red=198, green=45, blue=66)
 assert rgb_tuple_to_hsl((128, 128, 128)) == (0.0, 0.0, 128 / 255)
+
+# Function argument unpacking happens at the call site. A single * expands an
+# iterable into positional arguments in iteration order. ** expands a mapping
+# into keyword arguments, so its keys must be strings that match parameter names.
+type Vector = tuple[int, int, int]
+
+
+class VectorArguments(TypedDict):
+    x: int
+    y: int
+    z: int
+
+
+def make_vector(x: int, y: int, z: int) -> Vector:
+    return (x, y, z)
+
+
+tuple_vector: Vector = (1, 0, 1)
+dictionary_vector: VectorArguments = {"x": 1, "y": 0, "z": 1}
+assert make_vector(*tuple_vector) == (1, 0, 1)
+assert make_vector(**dictionary_vector) == (1, 0, 1)
+
+# Unpacking supplies ordinary arguments before Python performs its normal call
+# binding. The positional iterable therefore needs the right number of items;
+# the keyword mapping needs every required name and no unexpected or duplicate
+# names. This is the opposite direction from a parameter named *args/**kwargs,
+# which collects many incoming arguments into one tuple/dictionary.
 
 
 # 3.2 Designing functions with optional parameters

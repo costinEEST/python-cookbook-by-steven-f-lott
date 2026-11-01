@@ -184,6 +184,22 @@ def example(position_only, /, normal, *, keyword_only=False): ...
 - `*args`: extra positional arguments collected as a tuple.
 - `**kwargs`: extra keyword arguments collected as a dictionary.
 
+At a call site, the same symbols work in the opposite direction: they unpack one object into several arguments.
+
+```python
+def make_vector(x: int, y: int, z: int) -> tuple[int, int, int]:
+    return (x, y, z)
+
+
+tuple_vector = (1, 0, 1)
+dictionary_vector = {"x": 1, "y": 0, "z": 1}
+
+make_vector(*tuple_vector)  # positional: make_vector(1, 0, 1)
+make_vector(**dictionary_vector)  # keywords: make_vector(x=1, y=0, z=1)
+```
+
+`*` consumes an iterable in order, so its item count must fit the positional parameters. `**` requires string keys that match parameter names; missing, unexpected, or duplicate arguments raise `TypeError`. JavaScript/TypeScript spread provides the positional equivalent, `makeVector(...tupleVector)`. JavaScript has no keyword-call equivalent, so pass a typed options object and destructure `{ x, y, z }` in the function.
+
 Defaults are evaluated once when `def` executes. Never use a mutable default for per-call state:
 
 ```python

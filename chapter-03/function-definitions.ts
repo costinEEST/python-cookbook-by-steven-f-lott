@@ -63,6 +63,34 @@ assert.deepEqual(
 );
 assert.deepEqual(rgbTupleToHsl([128, 128, 128]), [0, 0, 128 / 255]);
 
+// Function argument unpacking
+// ---------------------------
+// JS/TS spread expands an iterable into positional arguments just like Python's
+// *tupleVector. A tuple type proves statically that the arity is exactly three.
+type Vector = readonly [x: number, y: number, z: number];
+
+function makeVector(x: number, y: number, z: number): Vector {
+  return [x, y, z];
+}
+
+const tupleVector: Vector = [1, 0, 1];
+assert.deepEqual(makeVector(...tupleVector), [1, 0, 1]);
+
+// JS has no ** call syntax or keyword-argument binding. Its conventional
+// equivalent is one options object whose properties are destructured by name.
+interface VectorArguments {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
+function makeVectorFromOptions({ x, y, z }: VectorArguments): Vector {
+  return makeVector(x, y, z);
+}
+
+const dictionaryVector = { x: 1, y: 0, z: 1 };
+assert.deepEqual(makeVectorFromOptions(dictionaryVector), [1, 0, 1]);
+
 // 3.2 Designing functions with optional parameters
 // ------------------------------------------------
 // A TS default also makes a parameter optional. Unlike Python, JS call sites
