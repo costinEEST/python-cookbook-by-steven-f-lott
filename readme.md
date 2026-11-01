@@ -24,6 +24,7 @@ Executable chapter summaries for learning [Python 3.12](https://docs.python.org/
 - Chapter 10: Working with Type Matching and Annotations — [Python](chapter-10/type-matching-and-annotations.py) · [TypeScript](chapter-10/type-matching-and-annotations.ts)
 - Chapter 11: Input/Output, Physical Format, and Logical Layout — [Python](chapter-11/input-output-physical-format-logical-layout.py) · [TypeScript](chapter-11/input-output-physical-format-logical-layout.ts)
 - Chapter 12: Graphics and Visualization with Jupyter Lab — [Python](chapter-12/graphics-and-visualization-with-jupyter-lab.py) · [TypeScript](chapter-12/graphics-and-visualization-with-jupyter-lab.ts)
+- Chapter 13: Application Integration: Configuration — [Python](chapter-13/application-integration-configuration.py) · [TypeScript](chapter-13/application-integration-configuration.ts)
 
 ## Python for TypeScript reference
 

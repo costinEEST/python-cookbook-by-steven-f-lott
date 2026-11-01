@@ -557,7 +557,28 @@ Computed Markdown can combine an `rf"..."` string with notebook display machiner
 
 #### Chapter 13: Application Integration: Configuration
 
-Planned focus: environment variables, command-line options, configuration files, defaults, validation, logging configuration, and secret-handling boundaries.
+[Python notes](chapter-13/application-integration-configuration.py) · [TypeScript notes](chapter-13/application-integration-configuration.ts)
+
+Treat configuration as precedence-ordered inputs. Start with built-in defaults, then load at most one alternative from each increasingly local tier (host, user, working directory). `collections.ChainMap` provides a live layered view without copying; JavaScript has no built-in equivalent, and object spread creates a snapshot instead. Keep discovery separate from parsing so either part can be tested with in-memory data.
+
+Python 3.11+ reads TOML with `tomllib.loads(text)` or `tomllib.load(binary_file)`. Tables and dotted keys become nested dictionaries. Node 26 has no standard TOML parser, so production TypeScript needs a maintained package and explicit runtime shape validation—an `interface` alone is erased.
+
+Python source and configuration classes can be loaded with `compile()` plus `exec()`, while JavaScript can dynamically import a module. Both execute code and are suitable only for trusted configuration; restricting builtins is not a security sandbox. A Python class can act as a namespace whose inherited class attributes supply defaults. TypeScript `static` fields are the closest runtime analogue, while `readonly` is only a static check.
+
+Design scripts around explicit boundaries:
+
+```python
+def get_config(arguments, environment): ...
+def run_application(config): ...
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Importing a module should define reusable behavior, not start work. This makes scripts testable and composable. Keep primary results separate from diagnostics: Python logger names form a dot-separated hierarchy, severity levels filter records, and `logging.config.dictConfig()` routes them to handlers. Prefer deferred logger formatting (`logger.info("value=%r", value)`). Node's standard `Console` can target separate streams but does not provide Python's named hierarchy or dictionary configuration.
+
+For shallow read-only access, Python's `MappingProxyType` exposes a live view and JavaScript's `Object.freeze()` freezes an object snapshot; neither recursively freezes nested values.
 
 #### Chapter 14: Application Integration: Combination
 
