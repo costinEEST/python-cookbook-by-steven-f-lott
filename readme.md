@@ -28,6 +28,7 @@ Executable chapter summaries for learning [Python 3.12](https://docs.python.org/
 - Chapter 14: Application Integration: Combination — [Python](chapter-14/application-integration-combination.py) · [TypeScript](chapter-14/application-integration-combination.ts)
 - Chapter 15: Testing — [Python](chapter-15/testing.py) · [TypeScript](chapter-15/testing.ts)
 - Chapter 16: Dependencies and Virtual Environments — [Python](chapter-16/dependencies-and-virtual-environments.py) · [TypeScript](chapter-16/dependencies-and-virtual-environments.ts)
+- Chapter 17: Documentation and Style — [Python](chapter-17/documentation-and-style.py) · [TypeScript](chapter-17/documentation-and-style.ts)
 
 ## Python for TypeScript reference
 

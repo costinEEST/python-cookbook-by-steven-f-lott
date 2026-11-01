@@ -674,20 +674,47 @@ When an upgrade fails, reproduce from the current lockfile, change one dependenc
 
 #### PEPs referenced in this guide
 
-A **Python Enhancement Proposal (PEP)** is a design document for Python itself or its surrounding processes and standards. A PEP can propose a feature, record a design decision, or define guidance; its status matters because not every proposal is accepted. The four PEPs referenced here are accepted or active standards, but they solve different problems:
+A **Python Enhancement Proposal (PEP)** is a design document for Python itself or its surrounding processes and standards. A PEP can propose a feature, record a design decision, or define guidance; its status matters because not every proposal is accepted. The PEPs referenced here are accepted or active standards, but they solve different problems:
 
 | PEP | Status and scope | What it means here | TypeScript/Node comparison |
 | --- | --- | --- | --- |
 | [PEP 8 — Style Guide for Python Code](https://peps.python.org/pep-0008/) | Active process guidance for readable Python source: naming, layout, imports, whitespace, and related conventions | Ruff enforces the machine-checkable subset selected in `pyproject.toml`; PEP 8 is guidance, not Python syntax, and project configuration can make deliberate choices beyond it | Comparable to a shared ESLint and formatter policy, though PEP 8 is an ecosystem-wide guide rather than a repository configuration file |
+| [PEP 257 — Docstring Conventions](https://peps.python.org/pep-0257/) | Active informational guidance for the meaning and high-level structure of Python docstrings; it deliberately does not mandate a markup syntax | Public modules, classes, functions, and methods should normally have docstrings with an imperative summary, a blank line before details, and relevant behavior, parameter, return, side-effect, exception, and constraint information | Comparable to JSDoc conventions, except a Python docstring is a runtime `__doc__` value rather than source-only metadata |
 | [PEP 517 — A build-system independent format for source trees](https://peps.python.org/pep-0517/) | Accepted packaging standard defining the interface through which a frontend asks a backend to build source distributions and wheels | `[build-system]` in `pyproject.toml` names a backend and its build requirements; tools can build the project without importing or executing a legacy `setup.py` command directly | Similar to a package manager invoking a configured build tool through a known contract, but the Python frontend/backend interface is standardized across tools |
 | [PEP 621 — Storing project metadata in `pyproject.toml`](https://peps.python.org/pep-0621/) | Accepted packaging standard for fields such as project name, version, supported Python versions, dependencies, and optional dependencies | `[project]` is the portable source of package metadata and direct runtime dependency intent; `[tool.*]` tables remain tool-specific | Closest to standardized `package.json` metadata and `dependencies`, while Python tools share the same TOML document with namespaced configuration |
+| [PEP 735 — Dependency Groups in `pyproject.toml`](https://peps.python.org/pep-0735/) | Accepted packaging standard for named, unpublished groups of development requirements | `[dependency-groups]` separates test, documentation, and quality tools from runtime dependencies and publishable extras | Comparable to `devDependencies`, with multiple named groups instead of one development bucket |
 | [PEP 751 — A file format to record Python dependencies for installation reproducibility](https://peps.python.org/pep-0751/) | Accepted packaging standard defining `pylock.toml` as an interoperable lock-file format | This project keeps uv's universal `uv.lock` as its canonical resolver state and exports `pylock.toml` when standards-based interchange is required | Comparable to a portable lockfile contract; unlike npm's manager-owned `package-lock.json`, it is intended for interoperability among Python tools |
 
 The PEP documents are authoritative for the standards themselves. Tool documentation remains authoritative for implementation details—for example, whether a particular uv, pip, Poetry, or build-backend release supports a standard and which commands it exposes.
 
 #### Chapter 17: Documentation and Style
 
-Planned focus: docstrings, type annotations, [PEP 8](https://peps.python.org/pep-0008/), Ruff, API documentation, examples, project documentation, and balancing Python idioms with readability.
+[Python notes](chapter-17/documentation-and-style.py) · [TypeScript notes](chapter-17/documentation-and-style.ts)
+
+A README is the project's front door, not its complete manual. State the audience, purpose, important features, requirements, installation, smallest working usage example, license, and contribution path; link to detailed documentation instead of duplicating it. Keep commands and examples executable so documentation failures become visible in CI.
+
+Sphinx turns RST or Markdown sources into HTML and other outputs. Its root document connects smaller pages with a `toctree`; extensions such as `sphinx.ext.autodoc` import Python modules and extract runtime docstrings. Keep imports free of surprising side effects, document parameters, returns, and exceptions, and build with warnings treated as errors:
+
+```console
+uv add --group docs sphinx
+uv run sphinx-build --fail-on-warning --keep-going --nitpicky -M html docs docs/_build
+```
+
+Python docstrings are runtime strings available through `__doc__`; TypeScript JSDoc is source metadata for editors and generators such as TypeDoc. [PEP 257](https://peps.python.org/pep-0257/) defines docstring structure, not whether a project uses RST, Google, or NumPy field syntax. Choose one markup convention consistently, let annotations carry type information, and reserve prose for behavior and constraints that signatures cannot express. Doctest makes Python examples executable, while TypeScript examples normally become assertions or tests. Ruff can lint PEP 257 conventions and format Python examples embedded in docstrings; enable rules deliberately so public-API policy does not turn into low-value documentation on every private helper.
+
+Classify dependencies by consumer. `[project].dependencies` are required at runtime, `[project.optional-dependencies]` are publishable feature extras, and [PEP 735](https://peps.python.org/pep-0735/) `[dependency-groups]` contain internal test, documentation, and quality tools. This is similar to `dependencies` versus `devDependencies` in `package.json`, with named Python groups allowing finer selection.
+
+| Concern | Earlier chapter workflow | Present practice (November 2026) |
+| --- | --- | --- |
+| README format | Prefer `README.rst` | Markdown and RST are both valid; declare the file with `[project].readme`, and choose the format supported by the publishing and documentation pipeline |
+| Docstrings | Sphinx RST fields as the default | Follow PEP 257 structure, choose RST/Google/NumPy markup consistently, and avoid repeating types already present in annotations |
+| Documentation build | Generated `make html` wrapper | Use a shell-neutral `sphinx-build`; CI should fail on warnings, continue to report all warnings, and check unresolved references in nitpicky mode |
+| Autodoc imports | Append `../src` to `sys.path` in `conf.py` | Install the project into the documentation environment when possible; keep imports side-effect-free and use a path override only when the build design requires it |
+| Development tools | Publish test and development tools as optional package extras | Put unpublished test, docs, and quality requirements in PEP 735 `[dependency-groups]`; reserve optional dependencies for consumer-facing features |
+| tox configuration | `tox.ini` or INI embedded in `pyproject.toml` | Native TOML under `[tool.tox]`; INI and `legacy_tox_ini` are deprecated |
+| Style automation | Combine separate formatters, linters, and import sorters | This repository uses Ruff for formatting, linting, import sorting, and docstring-example formatting, with ty for static type checking |
+
+tox creates isolated environments and executes a declarative matrix; nox defines comparable sessions in Python. They combine task-runner behavior with CI-style interpreter and dependency variants. Current tox uses native `[tool.tox]` TOML. A project with one locked environment can invoke uv commands directly; add tox when multiple Python versions or dependency combinations make its isolation useful.
 
 ## Essential terminology
 

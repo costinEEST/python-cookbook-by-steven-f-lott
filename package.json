@@ -22,6 +22,7 @@
     "chapter:14:ts": "node chapter-14/application-integration-combination.ts",
     "chapter:15:ts": "node chapter-15/testing.ts",
     "chapter:16:ts": "node chapter-16/dependencies-and-virtual-environments.ts",
+    "chapter:17:ts": "node chapter-17/documentation-and-style.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
