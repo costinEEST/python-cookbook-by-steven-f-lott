@@ -19,6 +19,7 @@
     "chapter:11:ts": "node chapter-11/input-output-physical-format-logical-layout.ts",
     "chapter:12:ts": "node chapter-12/graphics-and-visualization-with-jupyter-lab.ts",
     "chapter:13:ts": "node chapter-13/application-integration-configuration.ts",
+    "chapter:14:ts": "node chapter-14/application-integration-combination.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"

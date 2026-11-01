@@ -582,7 +582,28 @@ For shallow read-only access, Python's `MappingProxyType` exposes a live view an
 
 #### Chapter 14: Application Integration: Combination
 
-Planned focus: application composition, modules and packages, dependency boundaries, pipelines, services, concurrency choices, and integrating earlier recipes.
+[Python notes](chapter-14/application-integration-combination.py) · [TypeScript notes](chapter-14/application-integration-combination.ts)
+
+Prefer direct composition when components are importable: expose narrow functions, keep work out of import time, and let one top-level application own orchestration and logging. When a producer emits one batch but a consumer needs many, adapt the cardinality with an iterator rather than copying or rewriting either component.
+
+The Command pattern gives related operations one substitutable interface. Python's `ABC` and `@abstractmethod` enforce the contract when a class is instantiated; a TypeScript `interface` checks structure only during static analysis and disappears at runtime. A sequence command can compose commands, while a focused composite can hide intermediate details.
+
+For a command suite, centralize its CLI contract. `argparse.add_subparsers(required=True)` builds subcommands and `set_defaults(command=...)` can attach the implementation class selected by parsing. Node's stable `util.parseArgs()` parses options and positionals but does not provide subparsers, so dispatch on the first positional explicitly. Read environment-backed defaults at the input boundary and pass one validated options object into the core.
+
+Use a subprocess only when the component cannot be imported or process isolation is intentional:
+
+```python
+completed = subprocess.run(
+    [executable, "--samples", "10"],
+    check=True,
+    capture_output=True,
+    text=True,
+)
+```
+
+Pass arguments as a sequence and leave `shell=False` unless shell syntax is the actual requirement. `check=True` converts a nonzero status into `CalledProcessError`. Node's `execFile()`/`execFileSync()` similarly launch a program without a shell; synchronous calls block the event loop, so prefer `spawn()` or asynchronous `execFile()` in servers and for concurrent work.
+
+Captured output is external data: parse it, reject or ignore unrelated lines deliberately, and convert strings to application types at an explicit boundary. `capture_output=True` and `execFileSync()` buffer output, so redirect to a temporary file or consume streams when output can be large. If an all-or-nothing wrapper creates several files, track what it created, clean partial results after failure, and re-raise the original error.
 
 ### Stage 5 — Shipping reliable Python
 
