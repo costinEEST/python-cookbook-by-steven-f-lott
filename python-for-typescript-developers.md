@@ -634,11 +634,60 @@ For files, databases, subprocesses, and networks, use an isolated real resource 
 
 #### Chapter 16: Dependencies and Virtual Environments
 
-Planned focus: `pyproject.toml`, uv, lockfiles, virtual environments, packages, imports, dependency groups, reproducible commands, and parallels with `package.json`.
+[Python notes](chapter-16/dependencies-and-virtual-environments.py) · [TypeScript notes](chapter-16/dependencies-and-virtual-environments.ts)
+
+A virtual environment combines an interpreter entry point with an isolated `site-packages`. Treat `.venv` as disposable generated state: never commit, copy, or deploy it. Activation only modifies the current shell's `PATH`; scripts and automation can call the environment's interpreter directly. Unlike `.venv`, `node_modules` isolates packages but does not contain an isolated Node runtime.
+
+Separate dependency intent from resolution. `pyproject.toml` declares direct, broad requirements and project metadata; a lockfile records the complete resolved graph. A pip requirements file can be handwritten input or generated pinned output, so document its provenance. Extras, version constraints, and environment markers follow Python requirement-specifier syntax.
+
+This repository uses uv as its single Python project manager:
+
+```console
+uv sync --locked
+uv run --locked python chapter-16/dependencies-and-virtual-environments.py
+uv add package-name
+uv lock --check
+```
+
+uv discovers the project from `pyproject.toml`, keeps the editor-friendly environment in `.venv`, and creates a cross-platform `uv.lock`. Commit `uv.lock` and never edit it manually. `uv run` creates or updates the environment when needed, so activation is optional. This is closely analogous to committing `package.json` plus `package-lock.json` and using `npm ci`, although Python interpreter selection is also part of the environment.
+
+As of November 2026, `pylock.toml` is the standardized [PEP 751](https://peps.python.org/pep-0751/) lock format. uv can export its richer universal `uv.lock` to `pylock.toml`, `requirements.txt`, or CycloneDX when another tool needs an interchange artifact. pip 26.2.2 also provides an experimental `pip lock`, but its output is guaranteed only for the current Python version and platform. Keep `uv.lock` as this repository's canonical lock; export rather than maintaining two independent resolutions.
+
+| Concern | Earlier/common workflow | Present workflow in this repository (November 2026) |
+| --- | --- | --- |
+| Python installation | Install Python separately and hope `python` selects the intended interpreter | uv manages/discovers Python; `.python-version` pins the project default |
+| Environment creation | `python -m venv .venv` followed by shell-specific activation | `uv sync --locked` creates/synchronizes `.venv`; `uv run --locked ...` needs no activation |
+| Dependency declaration | Hand-maintained `requirements.txt` files | Direct runtime requirements in `[project].dependencies`; development tools in standardized `[dependency-groups]` |
+| Project metadata | `setup.py`, `setup.cfg`, or tool-specific files | Standards-based `pyproject.toml` with `[project]`, `[build-system]` when packaging, and `[tool.*]` configuration |
+| Resolution/locking | `pip freeze`, pip-tools-generated pinned requirements, or several platform files | One uv-managed, universal `uv.lock` committed to Git |
+| Standard lock interchange | No standardized Python lock format | [PEP 751](https://peps.python.org/pep-0751/) `pylock.toml`; export from uv when interoperability is needed |
+| pip locking | pip installed requirements but had no lock command | pip 26.2.2 has experimental `pip lock`; output remains current-platform/current-Python only |
+| Environment synchronization | `pip install -r requirements.txt`, recreate the venv, or `pip-sync` | `uv sync --locked` performs an exact sync and rejects stale lock metadata |
+| Running commands | Activate first, then rely on `PATH` | `uv run --locked <command>` selects and synchronizes the project environment explicitly |
+| One-off CLI tools | Install globally, create a dedicated venv, or use pipx | `uvx <tool>` / `uv tool run <tool>` uses isolated cached tool environments |
+| Upgrading | Loosen pins or regenerate everything, often changing many packages at once | `uv lock --upgrade-package <name>` updates one package within declared constraints; run the full quality gate before committing |
+| Specialized alternatives | conda or Poetry used as broad replacements for pip/venv | conda remains valuable for binary/non-Python ecosystems; Poetry 2.5 remains a cohesive packaging workflow, but neither is layered onto this uv-owned project |
+
+Other workflows solve related but distinct problems. pip-tools compiles broad inputs to pinned requirements and synchronizes an environment. Conda resolves Python together with non-Python binaries and channels; modern conda supports multi-platform lockfiles. Poetry manages [PEP 621](https://peps.python.org/pep-0621/) metadata, environments, and `poetry.lock`; in Poetry 2.x, `poetry shell` is an optional plugin, while `poetry run` and `poetry env activate` are core commands. Pick one owner for a project environment and lockfile rather than layering managers casually.
+
+When an upgrade fails, reproduce from the current lockfile, change one dependency at a time, and distinguish an API/test regression from an unsatisfiable dependency graph. Record the root cause and choose deliberately: adapt your code, report or fix upstream, replace the dependency, or revise a constraint. A temporary pin buys investigation time but accumulates risk if it is never reviewed. Run the entire runtime, test, lint, format, and static-analysis gate before accepting a new resolution.
+
+#### PEPs referenced in this guide
+
+A **Python Enhancement Proposal (PEP)** is a design document for Python itself or its surrounding processes and standards. A PEP can propose a feature, record a design decision, or define guidance; its status matters because not every proposal is accepted. The four PEPs referenced here are accepted or active standards, but they solve different problems:
+
+| PEP | Status and scope | What it means here | TypeScript/Node comparison |
+| --- | --- | --- | --- |
+| [PEP 8 — Style Guide for Python Code](https://peps.python.org/pep-0008/) | Active process guidance for readable Python source: naming, layout, imports, whitespace, and related conventions | Ruff enforces the machine-checkable subset selected in `pyproject.toml`; PEP 8 is guidance, not Python syntax, and project configuration can make deliberate choices beyond it | Comparable to a shared ESLint and formatter policy, though PEP 8 is an ecosystem-wide guide rather than a repository configuration file |
+| [PEP 517 — A build-system independent format for source trees](https://peps.python.org/pep-0517/) | Accepted packaging standard defining the interface through which a frontend asks a backend to build source distributions and wheels | `[build-system]` in `pyproject.toml` names a backend and its build requirements; tools can build the project without importing or executing a legacy `setup.py` command directly | Similar to a package manager invoking a configured build tool through a known contract, but the Python frontend/backend interface is standardized across tools |
+| [PEP 621 — Storing project metadata in `pyproject.toml`](https://peps.python.org/pep-0621/) | Accepted packaging standard for fields such as project name, version, supported Python versions, dependencies, and optional dependencies | `[project]` is the portable source of package metadata and direct runtime dependency intent; `[tool.*]` tables remain tool-specific | Closest to standardized `package.json` metadata and `dependencies`, while Python tools share the same TOML document with namespaced configuration |
+| [PEP 751 — A file format to record Python dependencies for installation reproducibility](https://peps.python.org/pep-0751/) | Accepted packaging standard defining `pylock.toml` as an interoperable lock-file format | This project keeps uv's universal `uv.lock` as its canonical resolver state and exports `pylock.toml` when standards-based interchange is required | Comparable to a portable lockfile contract; unlike npm's manager-owned `package-lock.json`, it is intended for interoperability among Python tools |
+
+The PEP documents are authoritative for the standards themselves. Tool documentation remains authoritative for implementation details—for example, whether a particular uv, pip, Poetry, or build-backend release supports a standard and which commands it exposes.
 
 #### Chapter 17: Documentation and Style
 
-Planned focus: docstrings, type annotations, PEP 8, Ruff, API documentation, examples, project documentation, and balancing Python idioms with readability.
+Planned focus: docstrings, type annotations, [PEP 8](https://peps.python.org/pep-0008/), Ruff, API documentation, examples, project documentation, and balancing Python idioms with readability.
 
 ## Essential terminology
 

@@ -8,8 +8,8 @@ The tooling supports that learning workflow: [uv](https://docs.astral.sh/uv/) ma
 
 Install:
 
-1. [uv 0.12.3 or newer](https://docs.astral.sh/uv/getting-started/installation/);
-2. [Node.js 23.6 or newer](https://nodejs.org/);
+1. [uv 0.13.6 or newer](https://docs.astral.sh/uv/getting-started/installation/);
+2. [Node.js 26 or newer](https://nodejs.org/);
 3. optionally, [Visual Studio Code](https://code.visualstudio.com/) and the workspace's recommended extensions.
 
 From the repository root, prepare both locked environments:
@@ -129,7 +129,7 @@ uv check --locked
 
 `uv check` prepares the environment and runs the ty version pinned in `uv.lock`. The project-wide ty source scope is configured under `[tool.ty.src]` in `pyproject.toml`.
 
-The integration is experimental as of October 2026. `uv check` currently runs ty only; it does not replace the separate Ruff lint and format commands. The project requires uv 0.12.3 or newer, the minimum version announced for this integration.
+The integration is experimental as of November 2026. `uv check` currently runs ty only; it does not replace the separate Ruff lint and format commands. The integration was introduced with uv 0.12.3; this repository now requires uv 0.13.6 or newer, the current release as of November 1, 2026.
 
 See the [uv check CLI reference](https://docs.astral.sh/uv/reference/cli/#uv-check) and [ty configuration reference](https://docs.astral.sh/ty/configuration/) for the current command and configuration details.
 
