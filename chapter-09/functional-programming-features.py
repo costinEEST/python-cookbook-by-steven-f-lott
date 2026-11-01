@@ -36,6 +36,56 @@ LOG_PATTERN = re.compile(
 )
 
 
+# Lambda expressions: small anonymous functions and their limits
+# ---------------------------------------------------------------
+# lambda creates a function object from one expression. The expression's value
+# is returned implicitly; `return` is neither needed nor legal in the body.
+def add(x: int, y: int) -> int:
+    return x + y
+
+
+assert add(5, 3) == 8
+assert (lambda x, y: x + y)(5, 3) == 8  # Create and call it immediately.
+
+# A lambda can be stored or passed anywhere a function is expected. Assigning a
+# lambda directly to a name is legal, but `def` is clearer, gives tracebacks a
+# useful function name, permits annotations/docstrings, and satisfies Ruff E731.
+binary_operations: dict[str, Callable[[int, int], int]] = {
+    "add": lambda x, y: x + y,
+    "larger": lambda x, y: x if x > y else y,
+}
+assert binary_operations["add"](5, 3) == add(5, 3)
+assert binary_operations["larger"](5, 3) == 5
+
+# The body may contain conditional expressions and function calls, but not
+# statements such as assignment, try/except, while, or an explicit return.
+# Keep intentionally invalid syntax in a string so this chapter remains valid.
+try:
+    compile("lambda x: return x", "<invalid-lambda>", "eval")
+except SyntaxError:
+    pass
+else:
+    raise AssertionError("a lambda body cannot contain a return statement")
+
+# Lambdas are closures with normal Python late binding: a free name is looked up
+# when the function runs, not frozen when it is created. A default parameter can
+# deliberately capture the current object instead. This often surprises code
+# that builds callbacks in a loop.
+offset = 1
+offset_operations: dict[str, Callable[[int], int]] = {
+    "late": lambda value: value + offset,
+    "frozen": lambda value, offset=offset: value + offset,
+}
+offset = 10
+assert offset_operations["late"](5) == 15
+assert offset_operations["frozen"](5) == 6
+
+# Lambda parameters can have defaults and *args/**kwargs, but Python's lambda
+# syntax has no parameter or return annotations. Use a surrounding type hint or
+# a named def when the signature needs documentation. Prefer def as soon as the
+# behavior needs statements, several steps, reuse, or a meaningful name.
+
+
 # 9.1 Writing generator functions with the yield statement
 # ----------------------------------------------------------
 def parse_line_iter(source: Iterable[str]) -> Iterator[RawLog]:

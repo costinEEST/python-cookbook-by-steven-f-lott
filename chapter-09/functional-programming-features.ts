@@ -19,6 +19,45 @@ interface DatedLog extends Omit<RawLog, "date"> {
 const logPattern =
   /^\[(?<date>.*?)]\s+(?<level>\w+)\s+in\s+(?<module>.+?):\s+(?<message>.+)$/;
 
+// Arrow functions: the closest TypeScript analogue to Python lambdas
+// -------------------------------------------------------------------
+function add(x: number, y: number): number {
+  return x + y;
+}
+
+assert.equal(add(5, 3), 8);
+assert.equal(((x: number, y: number) => x + y)(5, 3), 8);
+
+const binaryOperations: Readonly<Record<string, (x: number, y: number) => number>> = {
+  add: (x, y) => x + y,
+  larger: (x, y) => (x > y ? x : y),
+};
+assert.equal(binaryOperations.add?.(5, 3), add(5, 3));
+assert.equal(binaryOperations.larger?.(5, 3), 5);
+
+// An expression-bodied arrow returns implicitly like a Python lambda. Unlike a
+// lambda, a block-bodied arrow may contain statements but needs explicit return.
+const addWithBlock = (x: number, y: number): number => {
+  const result = x + y;
+  return result;
+};
+assert.equal(addWithBlock(5, 3), 8);
+
+// JS closures also observe a mutable outer binding at call time. Capture a
+// separate const when the creation-time value is required.
+let offset = 1;
+const capturedOffset = offset;
+const offsetOperations = {
+  late: (value: number): number => value + offset,
+  frozen: (value: number): number => value + capturedOffset,
+};
+offset = 10;
+assert.equal(offsetOperations.late(5), 15);
+assert.equal(offsetOperations.frozen(5), 6);
+
+// TypeScript arrows can annotate parameters and return types directly. They
+// also capture lexical `this`; Python lambdas have no special `this` behavior.
+
 // 9.1 Writing generator functions with the yield statement
 // ----------------------------------------------------------
 function* parseLineIter(source: Iterable<string>): Generator<RawLog> {

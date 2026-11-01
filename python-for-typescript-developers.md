@@ -444,6 +444,24 @@ valid = filter(is_valid, parsed)
 
 JavaScript generator functions share the one-shot, demand-driven model, and `yield*` corresponds to Python's `yield from`. JavaScript `Array.map()` and `Array.filter()` are eager, however; use generator helpers when laziness matters.
 
+A Python lambda is an expression that creates a function whose single expression is returned implicitly:
+
+```python
+def add(x: int, y: int) -> int:
+    return x + y
+
+
+add_now = (lambda x, y: x + y)(5, 3)  # 8; immediately invoked
+operations = {"add": lambda x, y: x + y}
+operations["add"](5, 3)  # 8
+```
+
+The body cannot contain statements such as `return`, assignment, `try`, or `while`, although it can use conditional expressions and call other functions. Directly assigning a lambda to a name is legal but usually inferior to `def`: a named function supports statements, annotations, a docstring, clearer tracebacks, and Ruff's preferred E731 style. Lambda syntax supports defaults and `*args`/`**kwargs`, but not parameter or return annotations.
+
+Lambdas close over names, not frozen values. A free name is normally looked up when the lambda runs; use a default such as `lambda value, offset=offset: value + offset` when a callback must retain the current object. This late-binding rule commonly surprises callback construction in loops.
+
+A TypeScript expression-bodied arrow such as `(x, y) => x + y` is the closest analogue and also returns implicitly. Unlike Python lambda, an arrow may use a statement block when it includes an explicit `return`, supports type annotations, and captures lexical `this`.
+
 Keep mapping and filtering rules as small named functions when they need type hints, tests, or statements such as `try`/`except`. Stack iterators into pipelines, but remember that consuming an iterator exhausts it. Materialize a `tuple` or `list` before multiple summaries; `itertools.tee()` may retain a large buffer when consumers advance unevenly.
 
 Use specialized reductions such as `sum()`, `min()`, `max()`, `math.prod()`, `any()`, and `all()` when possible. Identity values make empty inputs well-defined: `sum([]) == 0` and `math.prod([]) == 1`. `any()` and `all()` short-circuit like JavaScript `some()` and `every()`.
