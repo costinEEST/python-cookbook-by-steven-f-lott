@@ -609,7 +609,28 @@ Captured output is external data: parse it, reject or ignore unrelated lines del
 
 #### Chapter 15: Testing
 
-Planned focus: assertions, unit tests, fixtures, parameterization, mocks, doctests, property-based thinking, coverage, and parallels with Vitest/Jest.
+[Python notes](chapter-15/testing.py) · [TypeScript notes](chapter-15/testing.ts)
+
+Use doctest for small, stable examples that improve documentation. It compares REPL-shaped source and output literally, so normalize nondeterminism: sort sets, expose stable representations, and round or use `math.isclose()` for floats. For exceptions, keep the exception type and useful message while eliding traceback internals. Put complex or unhappy-path cases in `__test__` or a separate test module rather than overwhelming the public docstring. TypeScript/JSDoc has no standard doctest protocol; keep examples executable in a test runner.
+
+`unittest.TestCase` offers xUnit-style `setUp()`, `tearDown()`, assertion methods, discovery, and the `load_tests()` protocol for merging `doctest.DocTestSuite` cases. Prefer independent `test_*` methods over several unrelated assertions in one method, so one failure does not hide another.
+
+pytest uses plain test functions and built-in `assert`. A fixture is requested by naming it as a test parameter; fixtures can depend on other fixtures and each test normally receives fresh state. `pytest.raises()` tests exception contracts, parameterization runs the same scenario over multiple inputs, `monkeypatch` restores patched attributes/environment after a test, and `--doctest-modules` combines documentation examples with discovered tests.
+
+Make nondeterministic dependencies explicit:
+
+```python
+def save(payload, clock):
+    timestamp = clock()
+
+
+def resample(population, size, choose):
+    return [choose(population) for _ in range(size)]
+```
+
+Inject fixed clocks and deterministic choice functions, then assert both results and important interactions. A fixed random seed makes one pseudorandom sequence repeatable but couples the test to that generator's sequence; injection isolates the algorithm more precisely.
+
+For files, databases, subprocesses, and networks, use an isolated real resource for the happy path and mocks for failures that are unsafe or difficult to reproduce. Verify observable state first and only contractually important calls second. Python's `Mock` records calls and supports `return_value`/`side_effect`; Node's built-in `node:test` runner supplies mock functions, methods, timers, and dates. Avoid tests coupled to every internal call because harmless refactoring will break them.
 
 #### Chapter 16: Dependencies and Virtual Environments
 

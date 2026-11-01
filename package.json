@@ -20,6 +20,7 @@
     "chapter:12:ts": "node chapter-12/graphics-and-visualization-with-jupyter-lab.ts",
     "chapter:13:ts": "node chapter-13/application-integration-configuration.ts",
     "chapter:14:ts": "node chapter-14/application-integration-combination.ts",
+    "chapter:15:ts": "node chapter-15/testing.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"

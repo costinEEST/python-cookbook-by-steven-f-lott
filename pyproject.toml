@@ -19,6 +19,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    # Chapter 15 uses pytest's fixture injection, exception assertions,
+    # monkeypatching, parameterization, and doctest collection. unittest and
+    # doctest do not provide an equivalent integrated fixture/plugin framework.
+    "pytest>=9.0.0",
     # Ruff supplies linting, import sorting, and formatting; these quality checks
     # have no equivalent unified tool in the Python standard library.
     "ruff>=0.14.0",
