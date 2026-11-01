@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import csv
+import json
 import operator
+import pprint
 import re
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Iterator
@@ -105,6 +107,44 @@ assert sorted(scores.items(), key=operator.itemgetter(1)) == [
     ("first", 2),
     ("third", 2),
 ]
+
+# Formatting a dictionary for humans
+# ----------------------------------
+# Modern dict repr preserves insertion order, but a nested mapping can still be
+# easier to scan one key per line. json.dumps() first converts the mapping to
+# JSON text; indent controls nesting whitespace and sort_keys makes the display
+# deterministic by ordering these string keys without mutating my_mapping.
+my_mapping = {"a": 23, "b": 42, "c": 0xC0FFEE}  # 12,648,430 in decimal
+assert repr(my_mapping) == "{'a': 23, 'b': 42, 'c': 12648430}"
+
+pretty_json = json.dumps(my_mapping, indent=4, sort_keys=True)
+assert (
+    pretty_json
+    == """{
+    "a": 23,
+    "b": 42,
+    "c": 12648430
+}"""
+)
+assert my_mapping == {"a": 23, "b": 42, "c": 12_648_430}
+
+# JSON is a data-interchange format, not a general Python pretty-printer. Its
+# values are limited to JSON-compatible data, and object keys become strings.
+assert json.loads(json.dumps({1: "one", None: "missing"})) == {
+    "1": "one",
+    "null": "missing",
+}
+try:
+    json.dumps({object(): "unsupported"})
+except TypeError as error:
+    assert "keys must be" in str(error)
+else:
+    raise AssertionError("an arbitrary object cannot be a JSON object key")
+
+# pprint formats Python objects without converting them to JSON. It is the
+# better diagnostic display when Python-specific types must remain visible.
+python_specific = {("row", 1): {3, 1, 2}}
+assert pprint.pformat(python_specific, sort_dicts=True) == "{('row', 1): {1, 2, 3}}"
 
 
 # 5.2 Shrinking dictionaries: pop() and del

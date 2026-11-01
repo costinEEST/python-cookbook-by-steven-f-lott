@@ -262,6 +262,17 @@ by_value = sorted(scores.items(), key=operator.itemgetter(1))
 
 `.items()` supplies `(key, value)` tuples and `itemgetter(1)` selects tuple index 1 as each comparison key. The equivalent `lambda item: item[1]` is often easier to read inline. `sorted()` returns a new list and leaves the insertion-ordered dictionary unchanged; equal values retain their original order because Python sorting is stable. For a string-keyed TypeScript object, use `Object.entries(scores).toSorted((left, right) => left[1] - right[1])`.
 
+For a readable, deterministic display of JSON-compatible data, serialize with indentation and sorted keys:
+
+```python
+import json
+
+mapping = {"a": 23, "b": 42, "c": 0xC0FFEE}  # 12,648,430
+print(json.dumps(mapping, indent=4, sort_keys=True))
+```
+
+`json.dumps()` returns a string; `print()` writes it. This is serialization rather than general-purpose Python formatting: values must be JSON-compatible, and object keys are represented as strings. Use `pprint.pprint()` or `pprint.pformat()` to inspect Python-specific objects such as sets, tuples, or non-JSON keys. TypeScript uses `JSON.stringify(value, null, 4)`; it has no `sort_keys` option, so sort `Object.entries()` first when key order must be deterministic.
+
 Use specialized mapping shapes deliberately:
 
 ```python

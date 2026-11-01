@@ -107,6 +107,31 @@ assert.deepEqual(
   ],
 );
 
+// Formatting a dictionary for humans
+// ----------------------------------
+// JSON.stringify() is the direct JS analogue of json.dumps(). The third
+// argument controls indentation. JavaScript has no sort_keys option, so sort
+// entries first when deterministic alphabetical property order is required.
+const myMapping = { a: 23, b: 42, c: 0xc0ffee }; // 12,648,430 in decimal
+const sortedMapping = Object.fromEntries(
+  Object.entries(myMapping).toSorted(([left], [right]) => left.localeCompare(right)),
+);
+const prettyJson = JSON.stringify(sortedMapping, null, 4);
+assert.equal(
+  prettyJson,
+  `{
+    "a": 23,
+    "b": 42,
+    "c": 12648430
+}`,
+);
+assert.deepEqual(myMapping, { a: 23, b: 42, c: 12_648_430 });
+
+// JSON also represents an object key as text. Unlike Python json.dumps(),
+// JSON.stringify() silently skips symbol-keyed properties; BigInt values fail.
+assert.equal(JSON.stringify({ 1: "one" }), '{"1":"one"}');
+assert.throws(() => JSON.stringify({ unsupported: 1n }), TypeError);
+
 // 5.2 Shrinking dictionaries: pop() and del
 // --------------------------------------------
 function requestBatches(source: readonly string[]): LogRecord[][] {
