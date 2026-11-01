@@ -49,6 +49,27 @@ ratio_literal = {"num": 355, "den": 113}
 assert dict([("num", 355), ("den", 113)]) == ratio_literal
 assert dict(num=355, den=113) == ratio_literal
 
+# Merging dictionaries
+# --------------------
+# The capture's {**x, **y} form works on Python 3.5+. Each ** expression unpacks
+# key-value pairs into a new dictionary from left to right, so a later value
+# replaces an earlier value for the same key. Neither input is mutated.
+x = {"a": 1, "b": 2}
+y = {"b": 3, "c": 4}
+merged_by_unpacking = {**x, **y}
+assert merged_by_unpacking == {"a": 1, "b": 3, "c": 4}
+assert x == {"a": 1, "b": 2} and y == {"b": 3, "c": 4}
+
+# Python 3.9 added | as the clearer dictionary-union operator. It has the same
+# right-hand-wins rule and returns a new shallow dictionary. |= instead mutates
+# its left operand; nested mutable values remain shared in either form.
+merged_by_union = x | y
+assert merged_by_union == merged_by_unpacking
+mutable_merge = x.copy()
+mutable_merge |= y
+assert mutable_merge == merged_by_union
+assert mutable_merge is not x
+
 histogram: dict[str, int] = {}
 for _, _, _, details in log_records:
     if details.startswith("path"):

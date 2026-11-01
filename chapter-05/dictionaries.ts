@@ -50,6 +50,25 @@ assert.deepEqual(
   ratioLiteral,
 );
 
+// Merging dictionaries
+// --------------------
+// Object spread is the direct analogue of Python's { ...x, ...y } unpacking.
+// Properties are copied into a new object from left to right, so the later b
+// value wins. Neither input is mutated; this is a shallow copy in both languages.
+const x = { a: 1, b: 2 };
+const y = { b: 3, c: 4 };
+const mergedBySpread = { ...x, ...y };
+assert.deepEqual(mergedBySpread, { a: 1, b: 3, c: 4 });
+assert.deepEqual(x, { a: 1, b: 2 });
+assert.deepEqual(y, { b: 3, c: 4 });
+
+// Object.assign() can express mutation like Python's |=. The first argument is
+// the object changed and returned, so use a fresh object when mutation is unwanted.
+const mutableMerge = { ...x };
+assert.equal(Object.assign(mutableMerge, y), mutableMerge);
+assert.deepEqual(mutableMerge, mergedBySpread);
+assert.notEqual(mutableMerge, x);
+
 const histogram = new Map<string, number>();
 for (const [, , , details] of logRecords) {
   if (details.startsWith("path")) {

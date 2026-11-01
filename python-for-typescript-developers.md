@@ -250,6 +250,18 @@ merged = scores | {"Ada": 11}  # new dict; right side wins
 
 `in` checks keys, not values. A Python `dict` is often like a JavaScript `Map`; a string-keyed object is also a useful analogy, but Python keys are not coerced to strings.
 
+Dictionary unpacking, available since Python 3.5, merges into a new dictionary from left to right. A later occurrence of a key wins:
+
+```python
+x = {"a": 1, "b": 2}
+y = {"b": 3, "c": 4}
+
+merged = {**x, **y}  # {"a": 1, "b": 3, "c": 4}
+modern = x | y  # Python 3.9+; same result
+```
+
+Both forms are shallow and leave `x` and `y` unchanged; `x |= y` mutates `x`. TypeScript object spread, `{ ...x, ...y }`, has the same left-to-right overwrite rule and shallow-copy behavior. `Object.assign(target, y)` instead mutates and returns `target`.
+
 To get a value-sorted representation, sort the dictionary's item view with a key function:
 
 ```python
