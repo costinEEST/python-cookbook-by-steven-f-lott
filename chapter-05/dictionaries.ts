@@ -50,6 +50,33 @@ assert.deepEqual(
   ratioLiteral,
 );
 
+// Reading a value with a default
+// --------------------------------
+// Map.get() returns undefined for a missing key and does not mutate the Map.
+// JavaScript has no default argument here, so ?? supplies the fallback. With a
+// Map that may deliberately store undefined, use has() to distinguish the two.
+const nameForUserId = new Map<number, string>([
+  [382, "Alice"],
+  [590, "Bob"],
+  [951, "Dilbert"],
+]);
+
+function greeting(userId: number): string {
+  return `Hi ${nameForUserId.get(userId) ?? "there"}!`;
+}
+
+assert.equal(greeting(382), "Hi Alice!");
+assert.equal(greeting(333_333), "Hi there!");
+assert.deepEqual(
+  nameForUserId,
+  new Map([
+    [382, "Alice"],
+    [590, "Bob"],
+    [951, "Dilbert"],
+  ]),
+);
+assert.equal(nameForUserId.get(333_333), undefined);
+
 // Merging dictionaries
 // --------------------
 // Object spread is the direct analogue of Python's { ...x, ...y } unpacking.

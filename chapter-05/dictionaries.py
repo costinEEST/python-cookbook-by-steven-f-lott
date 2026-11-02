@@ -49,6 +49,27 @@ ratio_literal = {"num": 355, "den": 113}
 assert dict([("num", 355), ("den", 113)]) == ratio_literal
 assert dict(num=355, den=113) == ratio_literal
 
+# Reading a value with a default
+# --------------------------------
+# get(key, default) returns the stored value when key exists and the supplied
+# default otherwise. Unlike defaultdict, a missing-key lookup does not mutate
+# the dictionary. Omitting the second argument makes the default None.
+name_for_userid = {
+    382: "Alice",
+    590: "Bob",
+    951: "Dilbert",
+}
+
+
+def greeting(user_id: int) -> str:
+    return f"Hi {name_for_userid.get(user_id, 'there')}!"
+
+
+assert greeting(382) == "Hi Alice!"
+assert greeting(333_333) == "Hi there!"
+assert name_for_userid == {382: "Alice", 590: "Bob", 951: "Dilbert"}
+assert name_for_userid.get(333_333) is None
+
 # Merging dictionaries
 # --------------------
 # The capture's {**x, **y} form works on Python 3.5+. Each ** expression unpacks

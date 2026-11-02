@@ -266,6 +266,8 @@ merged = scores | {"Ada": 11}  # new dict; right side wins
 
 `in` checks keys, not values. A Python `dict` is often like a JavaScript `Map`; a string-keyed object is also a useful analogy, but Python keys are not coerced to strings.
 
+`mapping.get(key, default)` returns the value for an existing key or `default` for a missing key without inserting anything. If `default` is omitted, Python returns `None`. JavaScript's `Map.get(key)` instead returns `undefined`; `map.get(key) ?? fallback` is the usual equivalent when stored `undefined` values do not need to be distinguished from missing keys. Use `map.has(key)` when they do.
+
 Dictionary unpacking, available since Python 3.5, merges into a new dictionary from left to right. A later occurrence of a key wins:
 
 ```python
