@@ -4,12 +4,38 @@ A syntax cheatsheet, terminology guide, and learning path for developers who alr
 
 This is a memory aid, not a substitute for the executable notes. All 17 chapters summarize the paired, executable Python and TypeScript notes currently in this repository.
 
+## Contents
+
+- [How to use this reference](#how-to-use-this-reference)
+- [Quick start](#quick-start)
+- [At a glance: TypeScript to Python](#at-a-glance-typescript-to-python)
+- [Learning path](#learning-path)
+  - [Stage 1 — Core language and collections](#stage-1--core-language-and-collections)
+  - [Stage 2 — Interfaces and object design](#stage-2--interfaces-and-object-design)
+  - [Stage 3 — Functional and typed Python](#stage-3--functional-and-typed-python)
+  - [Stage 4 — Data, visualization, and applications](#stage-4--data-visualization-and-applications)
+  - [Stage 5 — Shipping reliable Python](#stage-5--shipping-reliable-python)
+  - [PEP index for the executable chapters](#pep-index-for-the-executable-chapters)
+- [Essential terminology](#essential-terminology)
+- [Transfer warnings for TypeScript developers](#transfer-warnings-for-typescript-developers)
+- [Further reading and inspiration](#further-reading-and-inspiration)
+
 ## How to use this reference
 
 1. Start with the translation table when you know the TypeScript spelling but not Python's.
 2. Read the completed chapter summaries in order for the semantic differences that cause bugs.
 3. Run each linked Python and TypeScript file; their assertions make the examples self-checking.
 4. Use the glossary to refresh Python-specific vocabulary.
+
+## Quick start
+
+```console
+python                 # interactive REPL
+python script.py       # run a script
+python -i script.py    # run it, then remain in the REPL with its names available
+```
+
+The launcher may be named `python3` on systems where `python` is absent or selects an older installation. This repository avoids ambient-interpreter ambiguity with `uv run --locked python <script>`; see Chapter 16.
 
 ## At a glance: TypeScript to Python
 
@@ -84,12 +110,29 @@ Strings are immutable Unicode sequences:
 ```python
 name = "Ada"
 message = f"{name=}, {len(name)=}"  # "name='Ada', len(name)=3"
+words = "  one two  ".strip().split()  # ["one", "two"]
+label = "-".join(words)  # "one-two"
+literal_backslash = r"C:\new"  # raw: backslash does not start \n
 first, *middle, last = "Python"
 utf8 = "🐍".encode("utf-8")
 text = utf8.decode("utf-8")
 ```
 
 Python indexes Unicode code points, while JavaScript indexes UTF-16 code units. `len("🐍") == 1`, but `"🐍".length === 2`.
+
+`strip(chars)`, `lstrip(chars)`, and `rstrip(chars)` remove any of the supplied characters repeatedly, not an exact prefix or suffix; use `removeprefix()` or `removesuffix()` for exact affixes. Raw strings still cannot end with an odd number of backslashes because the final quote would be escaped.
+
+Built-in constructors perform runtime conversion, while `type()`, `isinstance()`, and `issubclass()` inspect runtime types:
+
+```python
+count = int("42")
+ratio = float("3.14")
+assert isinstance(count, int)
+assert issubclass(bool, int)  # bool is an int subclass in Python
+assert bool("False") is True  # every non-empty string is truthy
+```
+
+Prefer `isinstance(value, Expected)` to `type(value) is Expected` when subclasses should count. Unlike TypeScript assertions such as `value as number`, these conversions and checks execute at runtime; `int("3.14")` raises `ValueError` rather than parsing a numeric prefix.
 
 Tuples are immutable runtime sequences:
 
@@ -588,6 +631,8 @@ For shallow read-only access, Python's `MappingProxyType` exposes a live view an
 
 Prefer direct composition when components are importable: expose narrow functions, keep work out of import time, and let one top-level application own orchestration and logging. When a producer emits one batch but a consumer needs many, adapt the cardinality with an iterator rather than copying or rewriting either component.
 
+Prefer explicit module or name imports. `from module import *` hides where names originate, can overwrite an existing binding, and makes static analysis and refactoring less reliable. Importing a module executes its top-level code once per process and then reuses the cached module object.
+
 The Command pattern gives related operations one substitutable interface. Python's `ABC` and `@abstractmethod` enforce the contract when a class is instantiated; a TypeScript `interface` checks structure only during static analysis and disappears at runtime. A sequence command can compose commands, while a focused composite can hide intermediate details.
 
 For a command suite, centralize its CLI contract. `argparse.add_subparsers(required=True)` builds subcommands and `set_defaults(command=...)` can attach the implementation class selected by parsing. Node's stable `util.parseArgs()` parses options and positionals but does not provide subparsers, so dispatch on the first positional explicitly. Read environment-backed defaults at the input boundary and pass one validated options object into the core.
@@ -881,6 +926,7 @@ except KeyError:
 
 - [Programming Idioms Python/JavaScript cheatsheet](https://programming-idioms.org/cheatsheet/Python/JS) — inspiration for naming a task, briefly stating its intent, and placing runtime-language implementations side by side.
 - [Python Morsels terminology](https://www.pythonmorsels.com/terms/) — inspiration for approachable definitions of Python vocabulary.
+- [Real Python Python Cheat Sheet](https://realpython.com/cheatsheets/python/) ([printable Pocket Reference PDF](https://static.realpython.com/python-cheatsheet.pdf)) — compared section by section for setup, core syntax, data types, control flow, functions, classes, exceptions, collections, comprehensions, files, imports, environments, packages, truthiness, and common idioms.
 - [Real Python learning paths](https://realpython.com/learning-paths/) — inspiration for organizing material from fundamentals through applied topics.
 - [Official Python documentation](https://docs.python.org/3/) — authoritative language and standard-library reference.
 
