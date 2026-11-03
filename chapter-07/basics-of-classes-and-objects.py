@@ -4,7 +4,7 @@ import csv
 import math
 import random
 from collections import ChainMap, Counter, defaultdict, deque
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import asdict, dataclass, field
 from io import StringIO
 from types import TracebackType
@@ -149,6 +149,23 @@ assert {eight_hearts: "card"}[Card(8, "♡")] == "card"
 # readonly and does not gain named attributes, value equality, or value hashing.
 
 
+# Choose NamedTuple only when positional sequence behavior is part of the public
+# contract. It inherits every tuple operation, even when that operation makes
+# little domain sense.
+class ParcelTuple(NamedTuple):
+    label: str
+    weight_kg: int
+
+
+tea_tuple = ParcelTuple("tea", 2)
+coffee_tuple = ParcelTuple("coffee", 3)
+assert tea_tuple[0] == tea_tuple.label
+assert tuple(tea_tuple) == ("tea", 2)  # Intentional positional interop.
+assert tea_tuple + coffee_tuple == ("tea", 2, "coffee", 3)
+assert tea_tuple * 2 == ("tea", 2, "tea", 2)
+assert coffee_tuple < tea_tuple  # Tuple ordering follows field position.
+
+
 # 7.5 Using dataclasses for mutable objects
 # -------------------------------------------
 @dataclass
@@ -158,6 +175,26 @@ class CribbageHand:
     def to_crib(self, first: Card, second: Card) -> None:
         self.cards.remove(first)
         self.cards.remove(second)
+
+
+@dataclass
+class Parcel:
+    """A record with named fields, not an accidental positional sequence."""
+
+    label: str
+    weight_kg: int
+
+
+@dataclass
+class IterableParcel:
+    """A record that deliberately promises label-then-weight iteration."""
+
+    label: str
+    weight_kg: int
+
+    def __iter__(self) -> Iterator[str | int]:
+        yield self.label
+        yield self.weight_kg
 
 
 @dataclass(init=False)
@@ -176,8 +213,28 @@ mutable_hand = CribbageHand([Card(3, "♢"), Card(6, "♠"), Card(7, "♢"), Car
 assert mutable_hand.to_crib(Card(3, "♢"), Card(1, "♠")) is None
 assert mutable_hand.cards == [Card(6, "♠"), Card(7, "♢")]
 assert len(Deck().cards) == 52
+tea_parcel = Parcel("tea", 2)
+coffee_parcel = Parcel("coffee", 3)
+assert tea_parcel == Parcel("tea", 2)
+for unsupported_expression in (
+    "tea_parcel + coffee_parcel",
+    "tea_parcel < coffee_parcel",
+):
+    try:
+        eval(
+            unsupported_expression,
+            {"tea_parcel": tea_parcel, "coffee_parcel": coffee_parcel},
+        )
+    except TypeError:
+        pass
+    else:  # pragma: no cover
+        raise AssertionError(f"{unsupported_expression} unexpectedly succeeded")
+iterable_parcel = IterableParcel("tea", 2)
+assert tuple(iterable_parcel) == ("tea", 2)
 # @dataclass generates __init__, __repr__, and value equality by default, but it
 # does not clone arguments: mutable_hand.cards aliases the list passed by its caller.
+# Prefer it for a named record that should not also concatenate, repeat, order, or
+# unpack. Add __iter__ only when field-order iteration is an intentional stable API.
 # TypeScript interfaces generate no runtime constructor or equality behavior.
 
 
@@ -205,6 +262,8 @@ assert first_empty_hand.cards == [frozen_card]
 # inside them. default_factory creates a fresh list per instance. This is like
 # TypeScript readonly being shallow, except Python enforces the field assignment
 # restriction at runtime and TypeScript normally enforces readonly only statically.
+# Add order=True only when comparing every instance by declaration-order fields is
+# meaningful; otherwise provide an explicit key at the specific sorting boundary.
 
 
 # 7.7 Optimizing small objects with __slots__

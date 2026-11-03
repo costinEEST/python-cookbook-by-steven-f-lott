@@ -147,6 +147,14 @@ assert.equal(cardPoints(eightHearts), 8);
 // Python NamedTuple, this object has no positional access, ordering, value equality,
 // or value-based Map/Set hashing. Those behaviors need explicit implementations.
 
+// Choose a tuple when positions are intentionally the API. TypeScript's readonly
+// modifier is static: at runtime this is still an Array with sequence methods.
+type ParcelTuple = readonly [label: string, weightKg: number];
+const teaTuple: ParcelTuple = ["tea", 2];
+const coffeeTuple: ParcelTuple = ["coffee", 3];
+assert.equal(teaTuple[0], "tea");
+assert.deepEqual(teaTuple.concat(coffeeTuple), ["tea", 2, "coffee", 3]);
+
 // 7.5 Using dataclasses for mutable objects
 // -------------------------------------------
 class CribbageHand {
@@ -165,6 +173,20 @@ class CribbageHand {
       this.cards.splice(index, 1);
     }
   }
+}
+
+interface Parcel {
+  readonly label: string;
+  readonly weightKg: number;
+}
+
+function parcelsEqual(left: Parcel, right: Parcel): boolean {
+  return left.label === right.label && left.weightKg === right.weightKg;
+}
+
+function* parcelValues(parcel: Parcel): IterableIterator<string | number> {
+  yield parcel.label;
+  yield parcel.weightKg;
 }
 
 class Deck {
@@ -193,9 +215,18 @@ assert.deepEqual(mutableHand.cards, [
   { rank: 7, suit: "♢" },
 ]);
 assert.equal(new Deck().cards.length, 52);
+const teaParcel: Parcel = { label: "tea", weightKg: 2 };
+const coffeeParcel: Parcel = { label: "coffee", weightKg: 3 };
+assert.equal(parcelsEqual(teaParcel, { label: "tea", weightKg: 2 }), true);
+assert.equal(parcelsEqual(teaParcel, coffeeParcel), false);
+assert.equal("concat" in teaParcel, false);
+assert.equal(Symbol.iterator in teaParcel, false);
+assert.deepEqual([...parcelValues(teaParcel)], ["tea", 2]);
 // @dataclass would generate construction, repr, and value equality. A TS class or
 // interface generates none of those automatically. Both versions retain the caller's
 // array/list reference; toCrib mutates that same collection and returns nothing.
+// Prefer an object/dataclass for a named record. Add iteration deliberately only if
+// consumers should depend on field order; use a comparator only for meaningful order.
 
 // 7.6 Using frozen dataclasses for immutable objects
 // ---------------------------------------------------

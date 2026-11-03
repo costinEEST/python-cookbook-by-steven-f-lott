@@ -50,6 +50,8 @@ Produce concise, executable notes that accurately represent the supplied source 
 ## Write executable learning notes
 
 - Adapt and summarize; do not transcribe the chapter. Preserve the concepts, representative examples, and important caveats.
+- Treat external code snippets as concept sources, not templates. Design an original example with different domain names and values that makes the behavior easier to predict or compare; never paste or lightly rename the source snippet unless the user explicitly asks for a faithful reproduction.
+- Record an external inspiration or supplemental source once in the most durable relevant prose location, normally `python-for-typescript-developers.md`. Do not repeat the same source URL in both executable siblings or beside every derived example unless line-level provenance is necessary to distinguish independently sourced claims.
 - Keep a `.py` file when runnable assertions materially improve learning. Use Markdown only when execution would add little value or the user requests it.
 - Keep Markdown prose unwrapped: use one source line per logical paragraph or list item, while preserving headings, blank lines, code fences, and tables. Do not impose a prose column limit.
 - Organize content in source order and make coverage auditable with section labels matching the chapter recipes.
