@@ -207,6 +207,26 @@ except Exception:
 
 `range` stores its bounds and computes integers on demand instead of allocating a list. The start is included and the stop is excluded; the step cannot be zero. JavaScript has no range object, so use a `for` loop when consuming values directly and materialize an array only when an array is actually required.
 
+Use `enumerate()` when a loop needs each value and a counter. It lazily yields `(counter, value)` tuples, which the two loop variables unpack. The counter defaults to zero; its optional `start` changes the first counter without skipping input values:
+
+```python
+for position, seat in enumerate("ABC", start=1):
+    print(f"{position}. {seat}")
+# 1. A
+# 2. B
+# 3. C
+```
+
+JavaScript array `.entries()` similarly yields `[index, value]` pairs, but its index is always zero-based. Strings do not directly expose `.entries()`, so spread the string first and add one when a one-based display label is needed:
+
+```typescript
+for (const [index, seat] of [..."ABC"].entries()) {
+  console.log(`${index + 1}. ${seat}`);
+}
+```
+
+Adjusting the displayed index changes only the label; it does not omit the first value.
+
 Catch specific exceptions before broad ones. A bare `except:` also catches shutdown-style exceptions such as `KeyboardInterrupt`; usually catch `Exception` instead.
 
 The walrus operator `:=` binds and returns a value inside an expression. Ordinary `=` remains a statement, unlike JavaScript assignment.
@@ -399,6 +419,8 @@ print("date", "2024-02-29", sep="=", end=", ")
 print("valid", True, sep="=")
 # date=2024-02-29, valid=True
 ```
+
+An f-string creates one completed string before `print()` is called, whereas `sep` matters only when `print()` receives multiple positional values. Prefer an f-string or template literal for a purpose-built message; prefer `sep` or JavaScript `join()` for a sequence of fields that share one delimiter.
 
 JavaScript's `console.log()` does not expose separator or terminator parameters. Build text with template literals or `join()`, use `Writable.write()` when newline control matters, and construct a Node `Console` with explicit `stdout`/`stderr` writable streams for Python-like output routing.
 

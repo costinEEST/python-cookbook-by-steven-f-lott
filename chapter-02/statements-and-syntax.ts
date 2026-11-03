@@ -193,6 +193,24 @@ assert.deepEqual(classifyComeOutRoll(7), { outcome: "winner", point: null });
 assert.deepEqual(classifyComeOutRoll(8), { outcome: "point", point: 8 });
 assert.throws(() => classifyComeOutRoll(13), RangeError);
 
+// Spreading a string produces Unicode-aware string elements, and entries()
+// pairs each element with a zero-based index. Unlike Python's enumerate(),
+// entries() has no custom start; adjust the displayed number explicitly. This
+// changes the label only and does not skip the first element.
+const seatCodes = [..."ABC"];
+assert.deepEqual(
+  [...seatCodes.entries()],
+  [
+    [0, "A"],
+    [1, "B"],
+    [2, "C"],
+  ],
+);
+const numberedSeats = [...seatCodes.entries()].map(
+  ([index, code]) => `${index + 1}. ${code}`,
+);
+assert.deepEqual(numberedSeats, ["1. A", "2. B", "3. C"]);
+
 // 2.6 Saving intermediate results with the := “walrus” operator
 // --------------------------------------------------------------
 // JavaScript assignment already is an expression. Parenthesize it in a

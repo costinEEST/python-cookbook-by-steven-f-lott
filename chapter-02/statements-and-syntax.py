@@ -199,6 +199,15 @@ except ValueError as error:
 else:  # pragma: no cover
     raise AssertionError("An impossible total must fail")
 
+# enumerate(iterable) lazily yields (counter, value) tuples. A for target with
+# two names unpacks each tuple. The counter starts at 0 unless start is supplied;
+# changing start labels the values differently but does not skip any values.
+seat_codes = "ABC"
+assert list(enumerate(seat_codes)) == [(0, "A"), (1, "B"), (2, "C")]
+assert list(enumerate(seat_codes, start=1)) == [(1, "A"), (2, "B"), (3, "C")]
+numbered_seats = [f"{number}. {code}" for number, code in enumerate(seat_codes, 1)]
+assert numbered_seats == ["1. A", "2. B", "3. C"]
+
 
 # 2.6 Saving intermediate results with the := “walrus” operator
 # --------------------------------------------------------------

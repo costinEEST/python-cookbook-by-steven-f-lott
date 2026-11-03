@@ -44,6 +44,16 @@ print("date", "10/25/13", sep="=", end=", ", file=output)
 print("change", 2.0, sep="=", file=output)
 assert output.getvalue() == "date=10/25/13, change=2.0\n"
 
+# An f-string constructs one string before print() receives it. sep is relevant
+# only when print() receives multiple positional values; it converts each value
+# to text and inserts the separator between them. Choose an f-string for a
+# purpose-built message and sep for a sequence of fields with one delimiter.
+seat_number, seat_code = 2, "B"
+assert f"{seat_number}.) {seat_code}" == "2.) B"
+output = StringIO()
+print(seat_number, seat_code, sep=".) ", file=output)
+assert output.getvalue() == "2.) B\n"
+
 
 # 6.2 Using input() and getpass() for user input
 # ------------------------------------------------

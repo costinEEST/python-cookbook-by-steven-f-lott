@@ -67,6 +67,14 @@ chapterConsole.error("Red Alert!");
 assert.equal(standardOutput.toString(), "date=10/25/13, change=2\n");
 assert.equal(standardError.toString(), "Red Alert!\n");
 
+// A template literal is the direct analogue of constructing one Python
+// f-string. JavaScript has no print sep parameter; joining converted fields
+// makes the delimiter explicit when formatting a field sequence.
+const seatNumber = 2;
+const seatCode = "B";
+assert.equal(`${seatNumber}.) ${seatCode}`, "2.) B");
+assert.equal([seatNumber, seatCode].join(".) "), "2.) B");
+
 // 6.2 Using input() and getpass() for user input
 // ------------------------------------------------
 type ReadText = (prompt: string) => Promise<string>;
