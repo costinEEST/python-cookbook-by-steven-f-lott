@@ -255,6 +255,62 @@ assert.deepEqual(unorderedCards.toSorted(compareCards), [
 // Python operators dispatch to __lt__, __le__, and related special methods. JS
 // has no customizable relational protocol; Array sorting takes a comparator.
 
+// Python binary dunders return the `NotImplemented` sentinel when an operand is
+// unsupported so the runtime can ask the other operand. JavaScript has no
+// overloadable equality/arithmetic protocol, so this explicit dispatcher models
+// that negotiation instead of changing `===` or `+`.
+// Source: https://www.pythonmorsels.com/when-to-use-notimplemented/
+const notImplemented = Symbol("NotImplemented");
+type NotImplemented = typeof notImplemented;
+
+interface EqualityParticipant {
+  equals(other: unknown): boolean | NotImplemented;
+}
+
+class Duration {
+  readonly totalSeconds: number;
+
+  constructor(totalSeconds: number) {
+    this.totalSeconds = totalSeconds;
+  }
+
+  equals(other: unknown): boolean | NotImplemented {
+    if (!(other instanceof Duration)) return notImplemented;
+    return this.totalSeconds === other.totalSeconds;
+  }
+
+  add(other: unknown): Duration | NotImplemented {
+    if (!(other instanceof Duration)) return notImplemented;
+    return new Duration(this.totalSeconds + other.totalSeconds);
+  }
+}
+
+class AlwaysEqual implements EqualityParticipant {
+  equals(_other: unknown): boolean {
+    return true;
+  }
+}
+
+function equalWithFallback(left: EqualityParticipant, right: unknown): boolean {
+  const leftResult = left.equals(right);
+  if (leftResult !== notImplemented) return leftResult;
+  if (typeof right === "object" && right !== null && "equals" in right) {
+    const rightResult = (right as EqualityParticipant).equals(left);
+    if (rightResult !== notImplemented) return rightResult;
+  }
+  return left === right;
+}
+
+const duration = new Duration(600);
+const sameDuration = new Duration(600);
+const alwaysEqual = new AlwaysEqual();
+assert.equal(equalWithFallback(duration, sameDuration), true);
+assert.equal(duration.equals(600), notImplemented);
+assert.equal(equalWithFallback(duration, alwaysEqual), true);
+assert.equal(equalWithFallback(duration, 600), false);
+assert.deepEqual(duration.add(new Duration(30)), new Duration(630));
+assert.equal(duration.add(30), notImplemented);
+
 // 8.7 Deleting from a list of complicated objects
 // --------------------------------------------------
 interface Song {

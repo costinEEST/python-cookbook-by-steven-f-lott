@@ -5,6 +5,7 @@ import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
+from types import NotImplementedType
 from typing import ClassVar, NamedTuple, Protocol, TypedDict, cast
 
 # Executable notes adapted from the user-saved HTML for Modern Python Cookbook,
@@ -269,6 +270,49 @@ assert sorted(unordered_cards) == [
 # Rich comparisons dispatch to special methods such as __lt__. Tuple comparison
 # supplies lexicographic ordering. @dataclass(order=True) or functools.total_ordering
 # can generate boilerplate; JS sort() instead receives an explicit comparator.
+
+
+# A binary dunder should return NotImplemented—not raise NotImplementedError or
+# guess False—when it does not understand the other operand. That sentinel asks
+# Python to try the reflected/right-hand operation. If neither operand supports
+# equality, == falls back to identity; unsupported ordering or arithmetic raises
+# TypeError. Source: https://www.pythonmorsels.com/when-to-use-notimplemented/
+@dataclass(frozen=True, eq=False)
+class Duration:
+    total_seconds: int
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Duration):
+            # object.__eq__ is typed as returning bool even though the runtime
+            # protocol permits this sentinel, so make that mismatch explicit.
+            return cast(bool, NotImplemented)
+        return self.total_seconds == other.total_seconds
+
+    def __add__(self, other: object) -> Duration | NotImplementedType:
+        if not isinstance(other, Duration):
+            return NotImplemented
+        return Duration(self.total_seconds + other.total_seconds)
+
+
+class AlwaysEqual:
+    def __eq__(self, other: object) -> bool:
+        return True
+
+
+duration = Duration(600)
+same_duration = Duration(600)
+always_equal = AlwaysEqual()
+assert duration == same_duration
+assert duration.__eq__(600) is NotImplemented
+assert duration == always_equal  # Delegates to AlwaysEqual.__eq__().
+assert duration != 600  # Both __eq__ methods decline, then identity is false.
+assert duration + Duration(30) == Duration(630)
+try:
+    eval("duration + 30", {"duration": duration})
+except TypeError:
+    pass
+else:  # pragma: no cover
+    raise AssertionError("unsupported addition unexpectedly succeeded")
 
 
 # 8.7 Deleting from a list of complicated objects

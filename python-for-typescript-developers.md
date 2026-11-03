@@ -473,6 +473,8 @@ Use `defaultdict(list)` for a map of lists when missing-key access should instal
 
 Ordering operators call rich-comparison methods such as `__lt__()` and `__le__()`. Comparing `(self.rank, self.suit)` tuples is a compact lexicographic key; `@dataclass(order=True)` or `functools.total_ordering` can generate methods. JavaScript objects cannot customize `<` this way, so pass a comparator to `toSorted()`/`sort()`.
 
+For a binary dunder such as `__eq__()` or `__add__()`, return the `NotImplemented` sentinel when the other operand's type is unsupported. Do not raise `NotImplementedError` and do not prematurely return `False`: the sentinel lets Python try the other operand's reflected operation. If both sides decline equality, `==` falls back to identity; if both decline ordering or arithmetic, Python raises `TypeError`. JavaScript has no equivalent operator-overloading dispatch, so model cross-type negotiation with an explicit method or function.
+
 When deleting matching list items in place, do not advance the index after `del items[index]`: the next item shifts into that index. A comprehension is usually simpler and faster when a new outer list is acceptable, but it is shallow and retains references to the same nested objects. The corresponding JavaScript distinction is in-place `splice()` versus copying `filter()`.
 
 ### Stage 3 — Functional and typed Python
