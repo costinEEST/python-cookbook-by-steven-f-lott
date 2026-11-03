@@ -101,6 +101,14 @@ const paddedText: unknown = "043";
 assert.equal([42] < (paddedText as number[]), false); // "42" < "043".
 assert.equal(Number([42]) < Number(paddedText), true); // 42 < 43.
 
+// Concatenation finishes before slicing in both languages. Unlike Python,
+// JavaScript bracket access accepts one property/index expression and has no
+// `[start:stop:step]` grammar, so a colon there is a parse-time SyntaxError.
+const routeCode = "NORTH" + "-17";
+assert.equal(routeCode, "NORTH-17");
+assert.equal(routeCode.slice(1, 6), "ORTH-"); // Start included, end excluded.
+assert.throws(() => Function("routeCode", "return routeCode[1:6]"), SyntaxError);
+
 // 1.3 Parsing strings with regular expressions
 // ---------------------------------------------
 const ingredientText = "Kumquat: 2 cups";

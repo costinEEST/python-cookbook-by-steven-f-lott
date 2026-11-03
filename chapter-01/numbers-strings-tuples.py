@@ -117,6 +117,18 @@ else:  # pragma: no cover
     raise AssertionError("str + int unexpectedly succeeded")
 assert "Trey" + str(integer_value) == "Trey2"
 
+# `+` finishes first and creates a new string. Python's subscription grammar
+# then recognizes the colon inside `[]` as a slice, constructs a slice object,
+# and passes it to str.__getitem__. The start is included, the stop is excluded,
+# and the result is another string because str is immutable.
+route_code = "NORTH" + "-17"
+middle = slice(1, 6)
+assert route_code == "NORTH-17"
+assert route_code[1:6] == route_code[middle] == "ORTH-"
+assert route_code.__getitem__(middle) == "ORTH-"
+# JavaScript bracket access has no colon-based slice grammar; its equivalent is
+# routeCode.slice(1, 6), shown and executed in the TypeScript sibling.
+
 
 # 1.3 Parsing strings with regular expressions
 # ------------------------------------------------

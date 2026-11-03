@@ -122,6 +122,8 @@ text = utf8.decode("utf-8")
 
 Python indexes Unicode code points, while JavaScript indexes UTF-16 code units. `len("🐍") == 1`, but `"🐍".length === 2`.
 
+Python makes slicing part of subscription syntax: `text[start:stop:step]` constructs a `slice` object and passes it to the value's `__getitem__()` method. Thus `route = "NORTH" + "-17"` first produces `"NORTH-17"`, then `route[1:6]` returns the new string `"ORTH-"`; index `1` is included and index `6` is excluded. JavaScript bracket access accepts a single property/index expression, so `route[1:6]` is invalid syntax rather than a missing string feature. Write `route.slice(1, 6)` in JavaScript or TypeScript. Both strings remain unchanged because strings are immutable.
+
 `strip(chars)`, `lstrip(chars)`, and `rstrip(chars)` remove any of the supplied characters repeatedly, not an exact prefix or suffix; use `removeprefix()` or `removesuffix()` for exact affixes. Raw strings still cannot end with an odd number of backslashes because the final quote would be escaped.
 
 Built-in constructors perform runtime conversion, while `type()`, `isinstance()`, and `issubclass()` inspect runtime types:
