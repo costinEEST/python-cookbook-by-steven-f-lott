@@ -55,8 +55,8 @@ class MemoryWritable extends Writable {
 }
 
 // Console is Node's direct analogue for print(file=...): it targets arbitrary
-// Writable streams. console.log() adds a newline, while Writable.write() gives
-// exact control over Python's sep/end behavior.
+// Writable streams. console.log() always adds a newline; Writable.write() gives
+// exact control corresponding to Python's default end="\n" or a custom end.
 const standardOutput = new MemoryWritable();
 const standardError = new MemoryWritable();
 const chapterConsole = new Console({ stdout: standardOutput, stderr: standardError });

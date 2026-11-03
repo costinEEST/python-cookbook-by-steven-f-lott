@@ -169,10 +169,24 @@ def classify_come_out_roll(total: int) -> tuple[CrapsOutcome, int | None]:
     raise ValueError(f"Design problem: impossible dice total {total}")
 
 
-# range(start, stop) is a lazy integer sequence whose stop is excluded. It does
-# not allocate a list. JS/TS has no built-in range object; the sibling uses
-# ordinary for loops, which preserve the same lazy iteration behavior. Use
-# Array.from() in TypeScript only when an actual array of values is required.
+# range stores start, stop, and step and computes integers on demand; it does not
+# allocate a list. One argument means range(0, stop, 1), and two arguments mean
+# range(start, stop, 1). The start is included, the stop is always excluded, and
+# a negative step counts downward. A zero step is invalid.
+assert list(range(4)) == [0, 1, 2, 3]
+assert list(range(3, 9)) == [3, 4, 5, 6, 7, 8]
+assert list(range(2, 12, 3)) == [2, 5, 8, 11]
+assert list(range(8, 1, -2)) == [8, 6, 4, 2]
+try:
+    range(1, 5, 0)
+except ValueError:
+    pass
+else:  # pragma: no cover
+    raise AssertionError("range() unexpectedly accepted a zero step")
+
+# Iterating the range avoids materializing those demonstration lists. JS/TS has
+# no built-in range object; the sibling uses ordinary for loops for lazy counting
+# and Array.from() only when an actual array of values is required.
 all_dice_totals = {left + right for left in range(1, 7) for right in range(1, 7)}
 assert all_dice_totals == set(range(2, 13))
 assert classify_come_out_roll(2) == ("craps", None)

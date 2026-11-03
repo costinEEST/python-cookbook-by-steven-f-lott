@@ -34,7 +34,8 @@ for leg in fuel_use:
     )
 assert output.getvalue().splitlines()[0] == "10/25/13 | 08:24:00 | 13:15:00 | 2.0"
 
-# sep joins fields; end follows the final field. file redirects the text stream.
+# sep joins fields; end follows the final field and defaults to "\n". An empty
+# end suppresses the newline, while file redirects output to another text stream.
 # JavaScript console.log() has no sep/end options; build a string with join() or
 # template literals. Node's Console targets Writable streams, whose write() method
 # provides exact newline control.

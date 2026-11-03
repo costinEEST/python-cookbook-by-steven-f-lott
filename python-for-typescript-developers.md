@@ -185,6 +185,11 @@ labels = "first second"  # "first second"
 Loops and exceptions have Python-specific clauses:
 
 ```python
+assert list(range(4)) == [0, 1, 2, 3]  # stop
+assert list(range(3, 9)) == [3, 4, 5, 6, 7, 8]  # start, stop
+assert list(range(2, 12, 3)) == [2, 5, 8, 11]  # start, stop, step
+assert list(range(8, 1, -2)) == [8, 6, 4, 2]  # descending
+
 for item in items:
     if matches(item):
         result = item
@@ -199,6 +204,8 @@ except FileNotFoundError as error:
 except Exception:
     raise  # re-raise unexpected failures
 ```
+
+`range` stores its bounds and computes integers on demand instead of allocating a list. The start is included and the stop is excluded; the step cannot be zero. JavaScript has no range object, so use a `for` loop when consuming values directly and materialize an array only when an array is actually required.
 
 Catch specific exceptions before broad ones. A bare `except:` also catches shutdown-style exceptions such as `KeyboardInterrupt`; usually catch `Exception` instead.
 

@@ -161,10 +161,26 @@ function classifyComeOutRoll(total: number): CrapsResult {
 }
 
 const allDiceTotals = new Set<number>();
-// Python range(1, 7) lazily yields 1 through 6 without allocating a list.
-// JS/TS has no range object, so a traditional for loop is the closest
-// equivalent. Array.from({ length: 6 }, (_, index) => index + 1) is appropriate
-// only when the values must be materialized as an array.
+// Python has range(stop), range(start, stop), and range(start, stop, step).
+// JS/TS has no range object, so traditional loops express the same lazy counting.
+const zeroBasedValues: number[] = [];
+for (let value = 0; value < 4; value += 1) zeroBasedValues.push(value);
+assert.deepEqual(zeroBasedValues, [0, 1, 2, 3]);
+
+const boundedValues: number[] = [];
+for (let value = 3; value < 9; value += 1) boundedValues.push(value);
+assert.deepEqual(boundedValues, [3, 4, 5, 6, 7, 8]);
+
+const steppedValues: number[] = [];
+for (let value = 2; value < 12; value += 3) steppedValues.push(value);
+assert.deepEqual(steppedValues, [2, 5, 8, 11]);
+
+const descendingValues: number[] = [];
+for (let value = 8; value > 1; value -= 2) descendingValues.push(value);
+assert.deepEqual(descendingValues, [8, 6, 4, 2]);
+
+// Array.from({ length: 6 }, (_, index) => index + 1) is appropriate only when
+// the values must be materialized. The loops below consume values directly.
 for (let left = 1; left <= 6; left += 1) {
   for (let right = 1; right <= 6; right += 1) allDiceTotals.add(left + right);
 }
