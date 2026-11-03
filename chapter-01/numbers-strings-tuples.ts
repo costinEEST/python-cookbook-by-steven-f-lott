@@ -79,6 +79,28 @@ assert.equal(floorDivision(5, 2), 2);
 assert.equal(floorDivision(-5, 2), -3);
 assert.equal(Math.trunc(-5 / 2), -2);
 
+// JavaScript does have runtime coercion. Explicit conversion makes the intent
+// visible (`String`, `Number`, `Boolean`); operators may instead trigger the
+// language's ToPrimitive/ToString/ToNumber/ToBoolean rules implicitly. A
+// TypeScript annotation does not change any of these JavaScript semantics.
+// Source: https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/types-grammar/ch4.md
+assert.equal(2 + 3.5, 5.5); // Both operands are already numbers.
+assert.equal("Trey" + 2, "Trey2"); // `+` chooses concatenation and stringifies 2.
+assert.equal("Trey" + String(2), "Trey2"); // Same result, explicit intent.
+assert.equal(Number("42"), 42);
+assert.equal(Boolean("False"), true); // Every non-empty JS string is truthy.
+
+// Prefer `===` when equality should not convert either operand. Relational
+// operators have no strict form, so normalize values before comparing when the
+// input types may differ. The casts below only let this teaching file express
+// JavaScript runtime cases that TypeScript rightly flags as suspicious.
+const numericText: unknown = "42";
+assert.equal(42 == (numericText as number), true); // Implicit ToNumber.
+assert.equal(42 === numericText, false);
+const paddedText: unknown = "043";
+assert.equal([42] < (paddedText as number[]), false); // "42" < "043".
+assert.equal(Number([42]) < Number(paddedText), true); // 42 < 43.
+
 // 1.3 Parsing strings with regular expressions
 // ---------------------------------------------
 const ingredientText = "Kumquat: 2 cups";

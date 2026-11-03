@@ -93,6 +93,30 @@ assert -5 // 2 == -3
 assert int(-5 / 2) == -2  # int(float) truncates, so it differs here.
 assert 7_358.0 // 3_600.0 == 2.0  # A float operand gives a float result.
 
+# Python has no general JavaScript-style implicit coercion rule. Mixed numeric
+# arithmetic works through the operands' operator methods: int.__add__ cannot
+# handle this float and returns NotImplemented, so Python tries float.__radd__.
+# The result is a float because that reflected operation accepts the int; Python
+# did not first rebind integer_value to a newly converted float object.
+# Source: https://www.pythonmorsels.com/type-coercion/
+integer_value = 2
+float_value = 3.5
+integer_add = object.__getattribute__(integer_value, "__add__")
+assert integer_add(float_value) is NotImplemented
+assert float_value.__radd__(integer_value) == 5.5
+assert integer_value + float_value == 5.5
+assert isinstance(integer_value, int)
+
+# Unrelated types do not get JavaScript's operator-driven conversion. Convert
+# explicitly at the boundary when that is the intended meaning.
+try:
+    eval('"Trey" + 2')
+except TypeError:
+    pass
+else:  # pragma: no cover
+    raise AssertionError("str + int unexpectedly succeeded")
+assert "Trey" + str(integer_value) == "Trey2"
+
 
 # 1.3 Parsing strings with regular expressions
 # ------------------------------------------------

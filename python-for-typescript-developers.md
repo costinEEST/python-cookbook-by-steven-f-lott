@@ -105,6 +105,8 @@ remainder = -5 % 2  # 1
 
 Python `int` has arbitrary precision, closer to JavaScript `bigint` than `number`, but mixes naturally with `float` in many expressions. Python has built-in complex numbers; JavaScript does not.
 
+Python does not apply JavaScript's general operator-driven coercion rules. For `2 + 3.5`, binary-operation dispatch lets the numeric types cooperate: `int.__add__()` returns `NotImplemented`, then `float.__radd__()` handles the pair. By contrast, `"Trey" + 2` raises `TypeError`; write `"Trey" + str(2)` when conversion is intended. JavaScript's `"Trey" + 2` implicitly stringifies the number, while `String(2)`, `Number(text)`, and `Boolean(value)` make conversion explicit. TypeScript annotations do not alter those runtime rules; prefer `===` when equality must not coerce, and normalize possibly mixed inputs before relational comparisons because JavaScript has no strict `<` operator.
+
 Strings are immutable Unicode sequences:
 
 ```python
