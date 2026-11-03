@@ -152,6 +152,19 @@ A TypeScript tuple is still a JavaScript array at runtime and is mutable unless 
 
 [Python notes](chapter-02/statements-and-syntax.py) · [TypeScript notes](chapter-02/statements-and-syntax.ts)
 
+Python has relatively few keywords because keywords are only words reserved by the grammar; they are not an inventory of built-ins, standard-library functions, methods, or language capabilities. `print`, `len`, `str`, and `open` are ordinary built-in names and can be rebound, while `if`, `class`, and `return` are syntax and cannot be used as identifiers. In Python 3.12, inspect the interpreter rather than copying a version-sensitive list:
+
+```python
+import keyword
+
+print(keyword.kwlist)  # hard keywords, like help("keywords")
+print(keyword.softkwlist)  # _, case, match, type in Python 3.12
+assert keyword.iskeyword("return")
+assert keyword.issoftkeyword("match")
+```
+
+Soft keywords are special only in particular grammar positions, so names such as `match` and `type` remain usable elsewhere. Node has no matching keyword-introspection API: Node executes JavaScript, and the ECMAScript specification—not the Node REPL—defines always-reserved words, context-dependent `await` and `yield`, strict-mode restrictions such as `interface` and `private`, and contextual grammar words such as `async`, `as`, and `of`. `.help` in the Node REPL lists REPL dot-commands. For a tool that must list JavaScript words, keep versioned sets derived from the [ECMAScript reserved-word grammar](https://tc39.es/ecma262/multipage/ecmascript-language-lexical-grammar.html#sec-keywords-and-reserved-words); do not infer them from globals such as `Object.getOwnPropertyNames(globalThis)`, because globals are ordinary bindings rather than grammar tokens. The [Python `keyword` module](https://docs.python.org/3.12/library/keyword.html) and [Node REPL documentation](https://nodejs.org/api/repl.html) describe the respective runtime interfaces.
+
 Blocks use a colon and indentation, not braces:
 
 ```python
@@ -750,7 +763,7 @@ A **Python Enhancement Proposal (PEP)** is a versioned design document for Pytho
 | [PEP 557 — Data Classes](https://peps.python.org/pep-0557/) | 7–12, 14–17 | Added `@dataclass` generation of constructors, representations, equality, ordering, and optional frozen behavior from annotated fields | A TypeScript `interface` is erased; reproducing dataclass runtime behavior requires an actual class or factory |
 | [PEP 572 — Assignment Expressions](https://peps.python.org/pep-0572/) | 2, 8–10, 13 | Added `name := expression` so one calculated value can be tested and retained inside an expression | JavaScript assignment is already an expression, but Python deliberately requires the visually distinct walrus operator and restricts its targets |
 | [PEP 616 — String Methods to Remove Prefixes and Suffixes](https://peps.python.org/pep-0616/) | 3 | Added `removeprefix()` and `removesuffix()` so affix removal does not misuse character-set-based `strip()` methods | Equivalent to checking `startsWith()`/`endsWith()` and slicing, packaged as intention-revealing methods |
-| [PEP 634 — Structural Pattern Matching: Specification](https://peps.python.org/pep-0634/) | 10 | Defined `match`/`case` patterns for destructuring sequences, mappings, classes, alternatives, captures, and guards | TypeScript narrowing uses conditionals and user-defined guards; it has no equivalent built-in structural pattern statement |
+| [PEP 634 — Structural Pattern Matching: Specification](https://peps.python.org/pep-0634/) | 2, 10 | Defined `match`/`case` patterns for destructuring sequences, mappings, classes, alternatives, captures, and guards; Chapter 2 also identifies their context-sensitive soft-keyword status | TypeScript narrowing uses conditionals and user-defined guards; it has no equivalent built-in structural pattern statement |
 | [PEP 635 — Structural Pattern Matching: Motivation and Rationale](https://peps.python.org/pep-0635/) | 10 | Explains why matching is a declarative data-shape dispatch feature rather than a C-style `switch` | Helps prevent reading `case` as JavaScript `switch`: Python patterns can destructure and bind names |
 | [PEP 636 — Structural Pattern Matching: Tutorial](https://peps.python.org/pep-0636/) | 10 | Provides the practical companion to the specification, including guards and class patterns | Maps most closely to a carefully ordered chain of TypeScript shape checks and destructuring assignments |
 | [PEP 3132 — Extended Iterable Unpacking](https://peps.python.org/pep-3132/) | 1, 10 | Added one starred assignment target such as `first, *middle, last`, with the starred name receiving a list | Similar to array destructuring with a rest element, but Python supports the starred target in any non-ambiguous position |
@@ -770,7 +783,7 @@ Type hints are metadata consumed by static analyzers and libraries; Python does 
 | [PEP 585 — Type Hinting Generics in Standard Collections](https://peps.python.org/pep-0585/) | 1–17 | Made built-ins such as `list[int]`, `dict[str, int]`, and `type[Command]` usable directly as generic annotations | Similar to `Array<number>` and `Record<string, number>`, but these Python generic aliases also exist as runtime objects |
 | [PEP 589 — TypedDict](https://peps.python.org/pep-0589/) | 3, 5, 8 | Added static fixed-key schemas for ordinary runtime dictionaries | Very close to a TypeScript object interface, including optional keys; neither adds runtime validation by itself |
 | [PEP 604 — Union Types as `X | Y`](https://peps.python.org/pep-0604/) | 2–17 | Added the concise union spelling and allowed it in `isinstance()` for supported runtime types | Uses the same ` | ` visual idea as a TypeScript union, but Python union objects are runtime values too |
-| [PEP 695 — Type Parameter Syntax](https://peps.python.org/pep-0695/) | 3–10, 13–15 | Added Python 3.12's `type Alias = ...` statement and bracketed type parameters such as `def first[T](...)` | More closely resembles TypeScript's `type Alias = ...` and `<T>` declarations than older `TypeVar` boilerplate |
+| [PEP 695 — Type Parameter Syntax](https://peps.python.org/pep-0695/) | 2–10, 13–15 | Added Python 3.12's soft keyword `type`, the `type Alias = ...` statement, and bracketed type parameters such as `def first[T](...)` | More closely resembles TypeScript's `type Alias = ...` and `<T>` declarations than older `TypeVar` boilerplate |
 | [PEP 3102 — Keyword-Only Arguments](https://peps.python.org/pep-3102/) | 3, 5–7, 10, 16 | Defined parameters after bare `*` as keyword-only, making call-site names part of the API | TypeScript normally models named options with an object parameter rather than language-level keyword arguments |
 | [PEP 3119 — Introducing Abstract Base Classes](https://peps.python.org/pep-3119/) | 14 | Established `ABC`, abstract methods, and nominal runtime interface checks | Comparable to an abstract TypeScript class, but Python prevents instantiation through runtime machinery |
 

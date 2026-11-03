@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import keyword
 import math
 from collections.abc import Callable
 from io import StringIO
@@ -20,6 +21,30 @@ print(π)
 compile(script_template, "example.py", "exec")
 assert script_template.encode().decode() == script_template
 assert "π" in script_template
+
+# Keywords are the small set of words reserved by Python's grammar, not a list
+# of everything Python can do. Most functionality lives behind ordinary names
+# such as print, len, open, str, imported modules, and object methods; those can
+# be rebound because they are not keywords. help("keywords") displays the hard
+# keywords interactively; the keyword module is the programmatic interface.
+hard_keywords = frozenset(keyword.kwlist)
+soft_keywords = frozenset(keyword.softkwlist)
+assert {"class", "def", "for", "while"} <= hard_keywords
+assert {"_", "case", "match", "type"} <= soft_keywords
+assert not hard_keywords & soft_keywords
+assert keyword.iskeyword("return")
+assert keyword.issoftkeyword("match")
+assert not keyword.iskeyword("print")
+
+# A soft keyword is special only in a particular grammar position, which lets
+# Python add syntax without reserving the word everywhere. These remain valid
+# ordinary names outside those contexts.
+match = "ordinary name outside a match statement"
+type = "ordinary name outside a type statement"
+assert (match, type) == (
+    "ordinary name outside a match statement",
+    "ordinary name outside a type statement",
+)
 
 
 # 2.2 Writing long lines of code

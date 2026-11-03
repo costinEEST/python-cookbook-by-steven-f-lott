@@ -21,6 +21,49 @@ assert.deepEqual(
   scriptTemplate,
 );
 
+// Node has no `help("keywords")` or keyword-enumeration API. Node executes
+// ECMAScript, whose specification defines reserved and contextual words; the
+// REPL's `.help` lists REPL dot-commands instead. Keep a spec-derived list when
+// a tool genuinely needs one, and version it with the ECMAScript grammar used.
+const ecmascriptReservedWords = new Set(
+  (
+    "await break case catch class const continue debugger default delete do " +
+    "else enum export extends false finally for function if import in " +
+    "instanceof new null return super switch this throw true try typeof var " +
+    "void while with yield"
+  ).split(" "),
+);
+const ecmascriptContextualKeywords = new Set([
+  "as",
+  "async",
+  "from",
+  "get",
+  "meta",
+  "of",
+  "set",
+  "target",
+]);
+const strictModeReservedWords = new Set([
+  "implements",
+  "interface",
+  "let",
+  "package",
+  "private",
+  "protected",
+  "public",
+  "static",
+]);
+assert.equal(ecmascriptReservedWords.has("class"), true);
+assert.equal(ecmascriptReservedWords.has("async"), false);
+assert.equal(ecmascriptContextualKeywords.has("async"), true);
+assert.equal(strictModeReservedWords.has("interface"), true);
+
+// As in Python, built-ins are not keywords. `console`, `Array`, and `Math` are
+// ordinary bindings/properties. `await` and `yield` also depend on grammar
+// context. TypeScript adds words of its own, but those belong to the TypeScript
+// grammar, not Node's API.
+assert.equal(ecmascriptReservedWords.has("console"), false);
+
 // 2.2 Writing long lines of code
 // -------------------------------
 // JS/TS permits physical line breaks in grouped expressions. Unlike Python,
